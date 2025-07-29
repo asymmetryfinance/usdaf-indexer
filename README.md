@@ -12,7 +12,7 @@ yarn install
 
 2. Create/edit `.env.local` with 2 environment variables
 
-`PONDER_RPC_URL_1=` Mainnet RPC URL
+`PONDER_RPC_URL_1=` Mainnet RPC URL  
 `DATABASE_URL=` Postgres database url
 
 3. Start the indexer
