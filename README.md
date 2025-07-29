@@ -33,8 +33,8 @@ After starting the indexer, you can access:
 
 The schema is located in `ponder.schema.ts`
 
-All timestamps are converted to UTC 0000 of the day (timezone naive).
-That means, all tables have 1 row max per day since the deployment of USDaf v2, timestamped at 0000.
+All timestamps are converted to UTC 0000 of the day (timezone naive).  
+That means, all tables have 1 row max per day since the deployment of USDaf v2, timestamped at 0000.  
 All balance changes within the day are aggregated into that row.
 
 `InterestRewards`
