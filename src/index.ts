@@ -148,9 +148,11 @@ ponder.on("USDaf:Transfer", async ({ event, context }) => {
       .insert(CurrentSpUsdafBalances)
       .values({
         id: zeroAddress,
+        lastUpdated: event.block.timestamp, // actual block ts
         [column]: Number(event.args.value) / 1e18,
       }) // the insert operation should only get hit once because we only have 1 row in this table
       .onConflictDoUpdate((row) => ({
+        lastUpdated: event.block.timestamp,
         // Add the new value to the existing value for the correct column
         [column]: ((row as any)[column] ?? 0) + Number(event.args.value) / 1e18,
       }));
@@ -183,6 +185,7 @@ ponder.on("USDaf:Transfer", async ({ event, context }) => {
     const currentSpUsdafBalances = await context.db
       .update(CurrentSpUsdafBalances, { id: zeroAddress })
       .set((row) => ({
+        lastUpdated: event.block.timestamp,
         // Subtract the new value from the existing value for the correct column
         [column]: ((row as any)[column] ?? 0) - Number(event.args.value) / 1e18,
       }));

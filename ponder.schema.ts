@@ -38,6 +38,7 @@ export const CurrentSpUsdafBalances = onchainTable(
   "current_sp_usdaf_balances",
   (t) => ({
     id: t.hex().primaryKey(), // this table only has 1 record, set to zeroAddress
+    lastUpdated: t.bigint().notNull(), // actual block ts
     ysyBOLD: t.real().notNull().default(0),
     scrvUSD: t.real().notNull().default(0),
     sUSDS: t.real().notNull().default(0),

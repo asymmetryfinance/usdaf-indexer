@@ -33,7 +33,7 @@ After starting the indexer, you can access:
 
 The schema is located in `ponder.schema.ts`
 
-All timestamps are converted to UTC 0000 of the day (timezone naive).  
+All timestamps (excl. CurrentSpUsdafBalances) are converted to UTC 0000 of the day (timezone naive).  
 That means, all tables have 1 row max per day since the deployment of USDaf v2, timestamped at 0000.  
 All balance changes within the day are aggregated into that row.
 
@@ -58,6 +58,7 @@ When querying the above tables, it may be necessary to forward fill data for day
 
 - Records the current USDaf balances in each SP
 - Only 1 row exists that is continuously updated with latest values
+- Column `lastUpdated` records the actual block timestamp when table updated, without conversion
 
 `Prices`
 
