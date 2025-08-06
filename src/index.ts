@@ -6,6 +6,7 @@ import {
   LiquidationRewards,
   CurrentSpUsdafBalances,
   SpUsdafBalances,
+  CurrentSpDepositorsBalances,
 } from "ponder:schema";
 import { getAddress, erc4626Abi, zeroAddress } from "viem";
 
@@ -230,5 +231,26 @@ ponder.on("TroveManager:Liquidation", async ({ event, context }) => {
     .onConflictDoUpdate((row) => ({
       // Add the new value to the existing value for the correct column
       [column]: ((row as any)[column] ?? 0) + collSentToSp,
+    }));
+});
+
+// SP Deposit/Withdraw events
+// Tracks user contributions
+ponder.on("StabilityPool:DepositOperation", async ({ event, context }) => {
+  const sp = getAddress(event.log.address);
+  const column = spToColumn[sp as keyof typeof spToColumn];
+
+  await context.db
+    .insert(CurrentSpDepositorsBalances)
+    .values({
+      depositor: getAddress(event.args._depositor),
+      lastUpdated: event.block.timestamp,
+      [column]: Number(event.args._topUpOrWithdrawal) / 1e18,
+    })
+    .onConflictDoUpdate((row) => ({
+      lastUpdated: event.block.timestamp,
+      [column]:
+        ((row as any)[column] ?? 0) +
+        Number(event.args._topUpOrWithdrawal) / 1e18,
     }));
 });

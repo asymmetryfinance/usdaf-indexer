@@ -33,7 +33,7 @@ After starting the indexer, you can access:
 
 The schema is located in `ponder.schema.ts`
 
-All timestamps (excl. CurrentSpUsdafBalances) are converted to UTC 0000 of the day (timezone naive).  
+All timestamps (excl. "lastUpdated") are converted to UTC 0000 of the day (timezone naive).  
 That means, all tables have 1 row max per day since the deployment of USDaf v2, timestamped at 0000.  
 All balance changes within the day are aggregated into that row.
 
@@ -64,6 +64,11 @@ When querying the above tables, it may be necessary to forward fill data for day
 
 - Daily collateral prices fetched from Defillama API
 - ysyBOLD prices read directly from ERC-4626 contract -- convertToAssets(1e18)
+
+`CurrentSpDepositorsBalances`
+
+- Records the current USDaf amount contributed by each user in each SP
+- Balances updated on each deposit/withdrawal
 
 ## Deployment and Database
 

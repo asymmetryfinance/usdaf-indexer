@@ -58,3 +58,18 @@ export const SpUsdafBalances = onchainTable("sp_usdaf_balances", (t) => ({
   tBTC: t.real().notNull(),
   WBTC: t.real().notNull(),
 }));
+
+// Current user deposits in SP, each column stores the current USDaf amount in the SP as contributed by user
+export const CurrentSpDepositorsBalances = onchainTable(
+  "current_sp_depositors_balances",
+  (t) => ({
+    depositor: t.hex().primaryKey(),
+    lastUpdated: t.bigint().notNull(), // actual block ts
+    ysyBOLD: t.real().notNull().default(0),
+    scrvUSD: t.real().notNull().default(0),
+    sUSDS: t.real().notNull().default(0),
+    sfrxUSD: t.real().notNull().default(0),
+    tBTC: t.real().notNull().default(0),
+    WBTC: t.real().notNull().default(0),
+  })
+);
