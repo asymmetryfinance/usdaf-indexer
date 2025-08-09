@@ -133,11 +133,11 @@ ponder.on("USDaf:Transfer", async ({ event, context }) => {
       .insert(InterestRewards)
       .values({
         timestamp: BigInt(timestamp),
-        [column]: Number(event.args.value) / 1e18,
+        [column]: event.args.value,
       })
       .onConflictDoUpdate((row) => ({
         // Add the new value to the existing value for the correct column
-        [column]: ((row as any)[column] ?? 0) + Number(event.args.value) / 1e18,
+        [column]: row[column] + event.args.value,
       }));
   }
 
@@ -150,12 +150,12 @@ ponder.on("USDaf:Transfer", async ({ event, context }) => {
       .values({
         id: zeroAddress,
         lastUpdated: event.block.timestamp, // actual block ts
-        [column]: Number(event.args.value) / 1e18,
+        [column]: event.args.value,
       }) // the insert operation should only get hit once because we only have 1 row in this table
       .onConflictDoUpdate((row) => ({
         lastUpdated: event.block.timestamp,
         // Add the new value to the existing value for the correct column
-        [column]: ((row as any)[column] ?? 0) + Number(event.args.value) / 1e18,
+        [column]: row[column] + event.args.value,
       }));
     // then we modify the daily balances table
     await context.db
@@ -188,7 +188,7 @@ ponder.on("USDaf:Transfer", async ({ event, context }) => {
       .set((row) => ({
         lastUpdated: event.block.timestamp,
         // Subtract the new value from the existing value for the correct column
-        [column]: ((row as any)[column] ?? 0) - Number(event.args.value) / 1e18,
+        [column]: ((row as any)[column] ?? 0n) - event.args.value,
       }));
     // then we modify the daily balances table
     await context.db
@@ -218,7 +218,7 @@ ponder.on("USDaf:Transfer", async ({ event, context }) => {
 ponder.on("TroveManager:Liquidation", async ({ event, context }) => {
   const timestamp = getStartOfDayUTC(Number(event.block.timestamp));
   const troveManager = getAddress(event.log.address);
-  const collSentToSp = Number(event.args._collSentToSP) / 1e18;
+  const collSentToSp = event.args._collSentToSP;
 
   const column = tmToColumn[troveManager as keyof typeof tmToColumn];
   // Insert or update the correct column in LiquidationRewards
@@ -230,7 +230,7 @@ ponder.on("TroveManager:Liquidation", async ({ event, context }) => {
     })
     .onConflictDoUpdate((row) => ({
       // Add the new value to the existing value for the correct column
-      [column]: ((row as any)[column] ?? 0) + collSentToSp,
+      [column]: row[column] + collSentToSp,
     }));
 });
 
@@ -245,12 +245,13 @@ ponder.on("StabilityPool:DepositOperation", async ({ event, context }) => {
     .values({
       depositor: getAddress(event.args._depositor),
       lastUpdated: event.block.timestamp,
-      [column]: Number(event.args._topUpOrWithdrawal) / 1e18,
+      [column]: event.args._topUpOrWithdrawal,
     })
     .onConflictDoUpdate((row) => ({
       lastUpdated: event.block.timestamp,
       [column]:
-        ((row as any)[column] ?? 0) +
-        Number(event.args._topUpOrWithdrawal) / 1e18,
+        row[column] + event.args._topUpOrWithdrawal < 0n // negative if withdrawing deposits + compounded yield
+          ? 0n
+          : row[column] + event.args._topUpOrWithdrawal,
     }));
 });
