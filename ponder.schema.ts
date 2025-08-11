@@ -73,3 +73,10 @@ export const CurrentSpDepositorsBalances = onchainTable(
     WBTC: t.bigint().notNull().default(0n),
   })
 );
+
+// Current USDaf LP balances for each depositor
+export const UsdafLpBalance = onchainTable("usdaf_lp_balance", (t) => ({
+  depositor: t.hex().primaryKey(),
+  balance: t.bigint().notNull().default(0n),
+  yvaultShares: t.bigint().notNull().default(0n),
+}));

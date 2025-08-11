@@ -7,6 +7,7 @@ import {
   CurrentSpUsdafBalances,
   SpUsdafBalances,
   CurrentSpDepositorsBalances,
+  UsdafLpBalance,
 } from "ponder:schema";
 import { getAddress, erc4626Abi, zeroAddress } from "viem";
 
@@ -254,4 +255,152 @@ ponder.on("StabilityPool:DepositOperation", async ({ event, context }) => {
           ? 0n
           : row[column] + event.args._topUpOrWithdrawal,
     }));
+});
+
+// USDaf LP events
+
+// SCRVUSD-USDaf Curve Pool events
+ponder.on("ScrvusdUsdafLp:Transfer", async ({ event, context }) => {
+  // if receiveer is not 0x0, we add to their balance
+  if (event.args.receiver !== zeroAddress) {
+    await context.db
+      .insert(UsdafLpBalance)
+      .values({
+        depositor: getAddress(event.args.receiver),
+        balance: event.args.value,
+      })
+      .onConflictDoUpdate((row) => ({
+        balance: row.balance + event.args.value,
+      }));
+  }
+
+  // if sender is not 0x0, we subtract from their balance
+  if (event.args.sender !== zeroAddress) {
+    await context.db
+      .update(UsdafLpBalance, { depositor: getAddress(event.args.sender) })
+      .set((row) => ({
+        balance: row.balance - event.args.value,
+      }));
+  }
+});
+
+// Stakedao
+ponder.on("ScrvusdUsdafSdGauge:Transfer", async ({ event, context }) => {
+  if (
+    event.args._from !== zeroAddress &&
+    getAddress(event.args._from) !==
+      "0x42c006fE6958a5211513AA61a9b3145E99dDEEFF" // staking_token from Stakedao Liquidity Gauge V4
+  ) {
+    await context.db
+      .update(UsdafLpBalance, {
+        depositor: getAddress(event.args._from),
+      })
+      .set((row) => ({
+        balance: row.balance - event.args._value,
+      }));
+  }
+
+  if (event.args._to !== zeroAddress) {
+    await context.db
+      .insert(UsdafLpBalance)
+      .values({
+        depositor: getAddress(event.args._to),
+        balance: event.args._value,
+      })
+      .onConflictDoUpdate((row) => ({
+        balance: row.balance + event.args._value,
+      }));
+  }
+});
+
+ponder.on("ScrvusdUsdafSdGauge:Withdraw", async ({ event, context }) => {
+  const depositorAddress = getAddress(event.args.provider);
+  await context.db
+    .update(UsdafLpBalance, { depositor: depositorAddress })
+    .set((row) => ({
+      balance: row.balance - event.args.value,
+    }));
+});
+
+// Convex
+ponder.on("ConvexBooster:Deposited", async ({ event, context }) => {
+  if (event.args.poolid !== BigInt(484)) return;
+
+  const depositorAddress = getAddress(event.args.user);
+
+  await context.db
+    .insert(UsdafLpBalance)
+    .values({
+      depositor: depositorAddress,
+      balance: event.args.amount,
+    })
+    .onConflictDoUpdate((row) => ({
+      balance: row.balance + event.args.amount,
+    }));
+});
+
+ponder.on("ConvexBooster:Withdrawn", async ({ event, context }) => {
+  if (event.args.poolid !== BigInt(484)) return;
+
+  const depositorAddress = getAddress(event.args.user);
+
+  await context.db
+    .update(UsdafLpBalance, { depositor: depositorAddress })
+    .set((row) => ({
+      balance: row.balance - event.args.amount,
+    }));
+});
+
+// Curve Gauge
+ponder.on("ScrvusdUsdafGauge:Transfer", async ({ event, context }) => {
+  if (event.args._from !== zeroAddress) {
+    await context.db
+      .update(UsdafLpBalance, {
+        depositor: getAddress(event.args._from),
+      })
+      .set((row) => ({
+        balance: row.balance - event.args._value,
+      }));
+  }
+
+  if (event.args._to !== zeroAddress) {
+    await context.db
+      .insert(UsdafLpBalance)
+      .values({
+        depositor: getAddress(event.args._to),
+        balance: event.args._value,
+      })
+      .onConflictDoUpdate((row) => ({
+        balance: row.balance + event.args._value,
+      }));
+  }
+});
+
+// SCRVUSD-USDaf Yearn vault
+ponder.on("ScrvusdUsdafYvault:Transfer", async ({ event, context }) => {
+  const sender = getAddress(event.args.sender);
+  const receiver = getAddress(event.args.receiver);
+  const shares = event.args.value;
+
+  if (sender !== zeroAddress) {
+    await context.db
+      .update(UsdafLpBalance, {
+        depositor: sender,
+      })
+      .set((row) => ({
+        yvaultShares: row.yvaultShares - shares,
+      }));
+  }
+
+  if (receiver !== zeroAddress) {
+    await context.db
+      .insert(UsdafLpBalance)
+      .values({
+        depositor: receiver,
+        yvaultShares: shares,
+      })
+      .onConflictDoUpdate((row) => ({
+        yvaultShares: row.yvaultShares + shares,
+      }));
+  }
 });

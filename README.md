@@ -70,6 +70,11 @@ When querying the above tables, it may be necessary to forward fill data for day
 - Records the current USDaf amount contributed by each user in each SP
 - Balances updated on each deposit/withdrawal
 
+`UsdafLpBalance`
+
+- "balance": records scrvUSD-USDaf Curve LP token amount
+- "yvaultShares": records vault share amount, call pricePerShare to convert to Curve LP amount
+
 ## Deployment and Database
 
 See [Ponder Docs](https://ponder.sh/docs/production/self-hosting)

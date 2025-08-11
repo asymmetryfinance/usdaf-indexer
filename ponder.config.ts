@@ -1,8 +1,13 @@
 import { createConfig } from "ponder";
 
 import { StabilityPoolAbi } from "./abis/StabilityPoolAbi";
+import { CurveStableSwapNgAbi } from "./abis/CurveStableSwapNgAbi";
+import { CurveLiquidityGaugeV6Abi } from "./abis/CurveLiquidityGaugeV6Abi";
+import { ConvexBoosterAbi } from "./abis/ConvexBoosterAbi";
 import { USDafAbi } from "./abis/USDafAbi";
 import { TroveManagerAbi } from "./abis/TroveManagerAbi";
+import { StakeDaoLiquidityGaugeV4Abi } from "./abis/StakeDaoLiquidityGaugeV4Abi";
+import { YearnTokenVaultAbi } from "./abis/YearnTokenVaultAbi";
 
 export default createConfig({
   database: {
@@ -47,6 +52,40 @@ export default createConfig({
         "0x7bd47Eca45ee18609D3D64Ba683Ce488ca9320A3",
       ], // ordered by CollateralRegistry index
       startBlock: 22976161,
+    },
+    // external contracts
+    ScrvusdUsdafLp: {
+      chain: "mainnet",
+      abi: CurveStableSwapNgAbi,
+      address: "0x3bE454C4391690ab4DDae3Fb987c8147b8Ecc08A",
+      startBlock: 22981417,
+    },
+    // Curve gauge
+    ScrvusdUsdafGauge: {
+      chain: "mainnet",
+      abi: CurveLiquidityGaugeV6Abi,
+      address: "0x3e56EC9bD2992D9220eD615CEaeC59613cCac730",
+      startBlock: 22981423,
+    },
+    ConvexBooster: {
+      chain: "mainnet",
+      abi: ConvexBoosterAbi,
+      address: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31",
+      startBlock: 22981423, // SCRVUSD-USDAF deployment block
+    },
+    // Stakedao gauge
+    ScrvusdUsdafSdGauge: {
+      chain: "mainnet",
+      abi: StakeDaoLiquidityGaugeV4Abi,
+      address: "0xc9f278b4EeC0f7cD90c621d2f1432e5EE7F55738",
+      startBlock: 23089468,
+    },
+    // Yearn Vault
+    ScrvusdUsdafYvault: {
+      chain: "mainnet",
+      abi: YearnTokenVaultAbi,
+      address: "0xe3Bf2D04cd3B6e74613D36368c7D21B2d6C26d72",
+      startBlock: 23034279,
     },
   },
   blocks: {
