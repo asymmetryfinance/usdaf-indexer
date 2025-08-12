@@ -75,6 +75,23 @@ When querying the above tables, it may be necessary to forward fill data for day
 - "balance": records scrvUSD-USDaf Curve LP token amount
 - "yvaultShares": records vault share amount, call pricePerShare to convert to Curve LP amount
 
+`AfcvxLpBalance`
+
+- "balance": records CVX-afCVX Curve LP token amount
+- "yvaultShares": records vault share amount, call pricePerShare to convert to Curve LP amount
+
+`AfcvxBalance`
+
+- Records afCVX amount for each depositor
+
+`SusdafBalance`
+
+- sUSDaf vault share balance
+
+`VeasfLocks`
+
+- Records all locks from deployment
+
 ## Deployment and Database
 
 See [Ponder Docs](https://ponder.sh/docs/production/self-hosting)

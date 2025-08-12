@@ -8,6 +8,10 @@ import {
   SpUsdafBalances,
   CurrentSpDepositorsBalances,
   UsdafLpBalance,
+  AfcvxLpBalance,
+  AfcvxBalance,
+  SusdafBalance,
+  VeasfLocks,
 } from "ponder:schema";
 import { getAddress, erc4626Abi, zeroAddress } from "viem";
 
@@ -324,31 +328,53 @@ ponder.on("ScrvusdUsdafSdGauge:Withdraw", async ({ event, context }) => {
 
 // Convex
 ponder.on("ConvexBooster:Deposited", async ({ event, context }) => {
-  if (event.args.poolid !== BigInt(484)) return;
-
   const depositorAddress = getAddress(event.args.user);
 
-  await context.db
-    .insert(UsdafLpBalance)
-    .values({
-      depositor: depositorAddress,
-      balance: event.args.amount,
-    })
-    .onConflictDoUpdate((row) => ({
-      balance: row.balance + event.args.amount,
-    }));
+  // pid 484 = SCRVUSD-USDaf pool
+  if (event.args.poolid === BigInt(484)) {
+    await context.db
+      .insert(UsdafLpBalance)
+      .values({
+        depositor: depositorAddress,
+        balance: event.args.amount,
+      })
+      .onConflictDoUpdate((row) => ({
+        balance: row.balance + event.args.amount,
+      }));
+  }
+
+  // pid 383 = CVX-afCVX pool
+  if (event.args.poolid === BigInt(383)) {
+    await context.db
+      .insert(AfcvxLpBalance)
+      .values({
+        depositor: depositorAddress,
+        balance: event.args.amount,
+      })
+      .onConflictDoUpdate((row) => ({
+        balance: row.balance + event.args.amount,
+      }));
+  }
 });
 
 ponder.on("ConvexBooster:Withdrawn", async ({ event, context }) => {
-  if (event.args.poolid !== BigInt(484)) return;
-
   const depositorAddress = getAddress(event.args.user);
 
-  await context.db
-    .update(UsdafLpBalance, { depositor: depositorAddress })
-    .set((row) => ({
-      balance: row.balance - event.args.amount,
-    }));
+  if (event.args.poolid === BigInt(484)) {
+    await context.db
+      .update(UsdafLpBalance, { depositor: depositorAddress })
+      .set((row) => ({
+        balance: row.balance - event.args.amount,
+      }));
+  }
+
+  if (event.args.poolid === BigInt(383)) {
+    await context.db
+      .update(AfcvxLpBalance, { depositor: depositorAddress })
+      .set((row) => ({
+        balance: row.balance - event.args.amount,
+      }));
+  }
 });
 
 // Curve Gauge
@@ -403,4 +429,191 @@ ponder.on("ScrvusdUsdafYvault:Transfer", async ({ event, context }) => {
         yvaultShares: row.yvaultShares + shares,
       }));
   }
+});
+
+// afCVX
+
+// naked afCVX balance
+ponder.on("Afcvx:Transfer", async ({ event, context }) => {
+  const from = getAddress(event.args.from);
+  const to = getAddress(event.args.to);
+  const value = event.args.value;
+
+  if (from !== zeroAddress) {
+    await context.db.update(AfcvxBalance, { depositor: from }).set((row) => ({
+      balance: row.balance - value,
+    }));
+  }
+
+  if (to !== zeroAddress) {
+    await context.db
+      .insert(AfcvxBalance)
+      .values({
+        depositor: to,
+        balance: value,
+      })
+      .onConflictDoUpdate((row) => ({
+        balance: row.balance + value,
+      }));
+  }
+});
+
+// afCVX Curve LP
+ponder.on("CvxAfcvxLp:Transfer", async ({ event, context }) => {
+  // if receiveer is not 0x0, we add to their balance
+  if (event.args.receiver !== zeroAddress) {
+    await context.db
+      .insert(AfcvxLpBalance)
+      .values({
+        depositor: getAddress(event.args.receiver),
+        balance: event.args.value,
+      })
+      .onConflictDoUpdate((row) => ({
+        balance: row.balance + event.args.value,
+      }));
+  }
+
+  // if sender is not 0x0, we subtract from their balance
+  if (event.args.sender !== zeroAddress) {
+    await context.db
+      .update(AfcvxLpBalance, { depositor: getAddress(event.args.sender) })
+      .set((row) => ({
+        balance: row.balance - event.args.value,
+      }));
+  }
+});
+
+// Stakedao
+ponder.on("CvxAfcvxSdGauge:Transfer", async ({ event, context }) => {
+  if (
+    event.args._from !== zeroAddress &&
+    getAddress(event.args._from) !==
+      "0x65f694948f6f59F18CdB503767A504253414EcD1" // staking_token from Stakedao Liquidity Gauge V4
+  ) {
+    await context.db
+      .update(AfcvxLpBalance, {
+        depositor: getAddress(event.args._from),
+      })
+      .set((row) => ({
+        balance: row.balance - event.args._value,
+      }));
+  }
+
+  if (event.args._to !== zeroAddress) {
+    await context.db
+      .insert(AfcvxLpBalance)
+      .values({
+        depositor: getAddress(event.args._to),
+        balance: event.args._value,
+      })
+      .onConflictDoUpdate((row) => ({
+        balance: row.balance + event.args._value,
+      }));
+  }
+});
+
+ponder.on("CvxAfcvxSdGauge:Withdraw", async ({ event, context }) => {
+  const depositorAddress = getAddress(event.args.provider);
+  await context.db
+    .update(AfcvxLpBalance, { depositor: depositorAddress })
+    .set((row) => ({
+      balance: row.balance - event.args.value,
+    }));
+});
+
+// Curve Gauge
+ponder.on("CvxAfcvxGauge:Transfer", async ({ event, context }) => {
+  if (event.args._from !== zeroAddress) {
+    await context.db
+      .update(AfcvxLpBalance, {
+        depositor: getAddress(event.args._from),
+      })
+      .set((row) => ({
+        balance: row.balance - event.args._value,
+      }));
+  }
+
+  if (event.args._to !== zeroAddress) {
+    await context.db
+      .insert(AfcvxLpBalance)
+      .values({
+        depositor: getAddress(event.args._to),
+        balance: event.args._value,
+      })
+      .onConflictDoUpdate((row) => ({
+        balance: row.balance + event.args._value,
+      }));
+  }
+});
+
+// CVX-afCVX Yearn vault
+ponder.on("CvxAfcvxYvault:Transfer", async ({ event, context }) => {
+  const sender = getAddress(event.args.sender);
+  const receiver = getAddress(event.args.receiver);
+  const shares = event.args.value;
+
+  if (sender !== zeroAddress) {
+    await context.db
+      .update(AfcvxLpBalance, {
+        depositor: sender,
+      })
+      .set((row) => ({
+        yvaultShares: row.yvaultShares - shares,
+      }));
+  }
+
+  if (receiver !== zeroAddress) {
+    await context.db
+      .insert(AfcvxLpBalance)
+      .values({
+        depositor: receiver,
+        yvaultShares: shares,
+      })
+      .onConflictDoUpdate((row) => ({
+        yvaultShares: row.yvaultShares + shares,
+      }));
+  }
+});
+
+// sUSDaf
+ponder.on("Susdaf:Transfer", async ({ event, context }) => {
+  const sender = getAddress(event.args.sender);
+  const receiver = getAddress(event.args.receiver);
+  const shares = event.args.value;
+
+  if (sender !== zeroAddress) {
+    await context.db
+      .update(SusdafBalance, { depositor: sender })
+      .set((row) => ({
+        balance: row.balance - shares,
+      }));
+  }
+
+  if (receiver !== zeroAddress) {
+    await context.db
+      .insert(SusdafBalance)
+      .values({
+        depositor: receiver,
+        balance: shares,
+      })
+      .onConflictDoUpdate((row) => ({
+        balance: row.balance + shares,
+      }));
+  }
+});
+
+// veASF locks
+ponder.on("Veasf:LockCreated", async ({ event, context }) => {
+  const account = event.args.account;
+  const amount = event.args.amount;
+  const weeks = event.args._weeks;
+  const timestamp = event.block.timestamp;
+
+  await context.db.insert(VeasfLocks).values({
+    id: `${event.transaction.hash}-${event.log.logIndex}`,
+    account: account,
+    amount: amount,
+    weeks: weeks,
+    timestamp: timestamp,
+  });
 });

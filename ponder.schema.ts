@@ -80,3 +80,31 @@ export const UsdafLpBalance = onchainTable("usdaf_lp_balance", (t) => ({
   balance: t.bigint().notNull().default(0n),
   yvaultShares: t.bigint().notNull().default(0n),
 }));
+
+// Current afCVX LP balances for each depositor
+export const AfcvxLpBalance = onchainTable("afcvx_lp_balance", (t) => ({
+  depositor: t.hex().primaryKey(),
+  balance: t.bigint().notNull().default(0n),
+  yvaultShares: t.bigint().notNull().default(0n),
+}));
+
+// afCVX holder balance
+export const AfcvxBalance = onchainTable("afcvx_balance", (t) => ({
+  depositor: t.hex().primaryKey(),
+  balance: t.bigint().notNull().default(0n),
+}));
+
+// sUSDaf holder balance
+export const SusdafBalance = onchainTable("susdaf_balance", (t) => ({
+  depositor: t.hex().primaryKey(),
+  balance: t.bigint().notNull().default(0n),
+}));
+
+// veASF locks
+export const VeasfLocks = onchainTable("veasf_locks", (t) => ({
+  id: t.text().primaryKey(),
+  account: t.hex().notNull(),
+  amount: t.bigint().notNull(),
+  weeks: t.bigint().notNull(),
+  timestamp: t.bigint().notNull(),
+}));

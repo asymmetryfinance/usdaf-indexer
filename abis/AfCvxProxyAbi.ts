@@ -1,0 +1,31 @@
+export const AfCvxProxyAbi = [
+  { inputs: [], stateMutability: "nonpayable", type: "constructor" },
+  {
+    inputs: [{ internalType: "address", name: "target", type: "address" }],
+    name: "AddressEmptyCode",
+    type: "error",
+  },
+  {
+    inputs: [
+      { internalType: "address", name: "implementation", type: "address" },
+    ],
+    name: "ERC1967InvalidImplementation",
+    type: "error",
+  },
+  { inputs: [], name: "ERC1967NonPayable", type: "error" },
+  { inputs: [], name: "FailedInnerCall", type: "error" },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: "address",
+        name: "implementation",
+        type: "address",
+      },
+    ],
+    name: "Upgraded",
+    type: "event",
+  },
+  { stateMutability: "payable", type: "fallback" },
+] as const;

@@ -1,4 +1,4 @@
-import { createConfig } from "ponder";
+import { createConfig, mergeAbis } from "ponder";
 
 import { StabilityPoolAbi } from "./abis/StabilityPoolAbi";
 import { CurveStableSwapNgAbi } from "./abis/CurveStableSwapNgAbi";
@@ -8,6 +8,10 @@ import { USDafAbi } from "./abis/USDafAbi";
 import { TroveManagerAbi } from "./abis/TroveManagerAbi";
 import { StakeDaoLiquidityGaugeV4Abi } from "./abis/StakeDaoLiquidityGaugeV4Abi";
 import { YearnTokenVaultAbi } from "./abis/YearnTokenVaultAbi";
+import { AfCvxImplAbi } from "./abis/AfCvxImplAbi";
+import { AfCvxProxyAbi } from "./abis/AfCvxProxyAbi";
+import { YearnV3VaultAbi } from "./abis/YearnV3VaultAbi";
+import { TokenLockerAbi } from "./abis/TokenLockerAbi";
 
 export default createConfig({
   database: {
@@ -53,6 +57,12 @@ export default createConfig({
       ], // ordered by CollateralRegistry index
       startBlock: 22976161,
     },
+    Veasf: {
+      chain: "mainnet",
+      abi: TokenLockerAbi,
+      address: "0xF119B5Aa93a7755b09952B3a88D04cdAf5329034",
+      startBlock: 21018718,
+    },
     // external contracts
     ScrvusdUsdafLp: {
       chain: "mainnet",
@@ -71,7 +81,7 @@ export default createConfig({
       chain: "mainnet",
       abi: ConvexBoosterAbi,
       address: "0xF403C135812408BFbE8713b5A23a04b3D48AAE31",
-      startBlock: 22981423, // SCRVUSD-USDAF deployment block
+      startBlock: 20379293, // CVX-afCVX deployment block
     },
     // Stakedao gauge
     ScrvusdUsdafSdGauge: {
@@ -86,6 +96,47 @@ export default createConfig({
       abi: YearnTokenVaultAbi,
       address: "0xe3Bf2D04cd3B6e74613D36368c7D21B2d6C26d72",
       startBlock: 23034279,
+    },
+    // afCVX
+    Afcvx: {
+      chain: "mainnet",
+      abi: mergeAbis([AfCvxProxyAbi, AfCvxImplAbi]),
+      address: "0x8668a15b7b023Dc77B372a740FCb8939E15257Cf",
+      startBlock: 19784027,
+    },
+    CvxAfcvxLp: {
+      chain: "mainnet",
+      abi: CurveStableSwapNgAbi,
+      address: "0x7956FAd09a1D1C47550331E7f06bF7c7B7C2aF08",
+      startBlock: 20379393,
+    },
+    // Stakedao gauge
+    CvxAfcvxSdGauge: {
+      chain: "mainnet",
+      abi: StakeDaoLiquidityGaugeV4Abi,
+      address: "0xD47FC7704dc185feb5195416E16ae531eFa400A4",
+      startBlock: 21445720,
+    },
+    // Curve gauge
+    CvxAfcvxGauge: {
+      chain: "mainnet",
+      abi: CurveLiquidityGaugeV6Abi,
+      address: "0x9755e37A291a37d8a0AB0828699A59b445477514",
+      startBlock: 20379532,
+    },
+    // Yearn vault
+    CvxAfcvxYvault: {
+      chain: "mainnet",
+      abi: YearnTokenVaultAbi,
+      address: "0x97aae86E5efC305f2189f78B5C7e9Dac1249c379",
+      startBlock: 22391253,
+    },
+    // sUSDaf
+    Susdaf: {
+      chain: "mainnet",
+      abi: YearnV3VaultAbi,
+      address: "0x89E93172AEF8261Db8437b90c3dCb61545a05317",
+      startBlock: 22978001,
     },
   },
   blocks: {
