@@ -14,10 +14,10 @@ import { YearnV3VaultAbi } from "./abis/YearnV3VaultAbi";
 import { TokenLockerAbi } from "./abis/TokenLockerAbi";
 
 export default createConfig({
-  database: {
-    kind: "postgres",
-    connectionString: process.env.DATABASE_URL!,
-  },
+  // database: {
+  //   kind: "postgres",
+  //   connectionString: process.env.DATABASE_URL!,
+  // },
   chains: {
     mainnet: {
       id: 1,

@@ -108,3 +108,50 @@ export const VeasfLocks = onchainTable("veasf_locks", (t) => ({
   weeks: t.bigint().notNull(),
   timestamp: t.bigint().notNull(),
 }));
+
+// Redemption
+export const Redemption = onchainTable("redemption", (t) => ({
+  id: t.text().primaryKey(),
+  timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
+  troveManager: t.hex().notNull(),
+  attemptedBoldAmount: t.bigint().notNull(),
+  debtDecrease: t.bigint().notNull(),
+  collDecrease: t.bigint().notNull(),
+  price: t.bigint().notNull(),
+  redemptionPrice: t.bigint().notNull(),
+  entireColl: t.bigint().notNull(),
+  entireDebt: t.bigint().notNull(),
+}));
+
+// TroveUpdated
+export const TroveUpdated = onchainTable("trove_updated", (t) => ({
+  id: t.text().primaryKey(),
+  timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
+  troveManager: t.hex().notNull(),
+  troveId: t.bigint().notNull(),
+  debt: t.bigint().notNull(),
+  coll: t.bigint().notNull(),
+  stake: t.bigint().notNull(),
+  annualInterestRate: t.bigint().notNull(),
+  entireColl: t.bigint().notNull(),
+  entireDebt: t.bigint().notNull(),
+  price: t.bigint().notNull(),
+}));
+
+// TroveOperation
+export const TroveOperation = onchainTable("trove_operation", (t) => ({
+  id: t.text().primaryKey(),
+  timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
+  troveManager: t.hex().notNull(),
+  troveId: t.bigint().notNull(),
+  op: t.integer().notNull(),
+  annualInterestRate: t.bigint().notNull(),
+  debtIncreaseFromRedist: t.bigint().notNull(),
+  debtIncreaseFromUpfrontFee: t.bigint().notNull(),
+  debtChangeFromOperation: t.bigint().notNull(),
+  collIncreaseFromRedist: t.bigint().notNull(),
+  collChangeFromOperation: t.bigint().notNull(),
+}));
