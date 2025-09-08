@@ -326,6 +326,35 @@ ponder.on("ScrvusdUsdafSdGauge:Withdraw", async ({ event, context }) => {
     }));
 });
 
+// Stakedao Staking v2
+ponder.on("ScrvusdUsdafSdGaugeV2:Transfer", async ({ event, context }) => {
+  const from = getAddress(event.args.from);
+  const to = getAddress(event.args.to);
+  const value = event.args.value;
+
+  if (from !== zeroAddress) {
+    await context.db
+      .update(UsdafLpBalance, {
+        depositor: from,
+      })
+      .set((row) => ({
+        balance: row.balance - value,
+      }));
+  }
+
+  if (to !== zeroAddress) {
+    await context.db
+      .insert(UsdafLpBalance)
+      .values({
+        depositor: to,
+        balance: value,
+      })
+      .onConflictDoUpdate((row) => ({
+        balance: row.balance + value,
+      }));
+  }
+});
+
 // Convex
 ponder.on("ConvexBooster:Deposited", async ({ event, context }) => {
   const depositorAddress = getAddress(event.args.user);

@@ -12,6 +12,7 @@ import { AfCvxImplAbi } from "./abis/AfCvxImplAbi";
 import { AfCvxProxyAbi } from "./abis/AfCvxProxyAbi";
 import { YearnV3VaultAbi } from "./abis/YearnV3VaultAbi";
 import { TokenLockerAbi } from "./abis/TokenLockerAbi";
+import { StakeDaoRewardVaultAbi } from "./abis/StakeDaoRewardVaultAbi";
 
 export default createConfig({
   database: {
@@ -89,6 +90,13 @@ export default createConfig({
       abi: StakeDaoLiquidityGaugeV4Abi,
       address: "0xc9f278b4EeC0f7cD90c621d2f1432e5EE7F55738",
       startBlock: 23089468,
+    },
+    // Stakedao v2 gauge
+    ScrvusdUsdafSdGaugeV2: {
+      chain: "mainnet",
+      abi: StakeDaoRewardVaultAbi,
+      address: "0xdC147Ba5aBD134f631A67190DEB97B7828B4aFB7",
+      startBlock: 23276535,
     },
     // Yearn Vault
     ScrvusdUsdafYvault: {
