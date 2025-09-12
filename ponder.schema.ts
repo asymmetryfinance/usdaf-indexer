@@ -108,3 +108,18 @@ export const VeasfLocks = onchainTable("veasf_locks", (t) => ({
   weeks: t.bigint().notNull(),
   timestamp: t.bigint().notNull(),
 }));
+
+// Defi Stable Avengers Convex vault mapping
+export const DsaLpConvexVaultMapping = onchainTable(
+  "dsa_lp_convex_vault_mapping",
+  (t) => ({
+    vault: t.hex().primaryKey(),
+    user: t.hex().notNull(),
+    transactionHash: t.hex().notNull(), // tx that created the vault
+  })
+);
+
+export const DsaLpBalance = onchainTable("dsa_lp_balance", (t) => ({
+  depositor: t.hex().primaryKey(),
+  balance: t.bigint().notNull().default(0n),
+}));

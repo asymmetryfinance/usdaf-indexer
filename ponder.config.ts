@@ -13,6 +13,9 @@ import { AfCvxProxyAbi } from "./abis/AfCvxProxyAbi";
 import { YearnV3VaultAbi } from "./abis/YearnV3VaultAbi";
 import { TokenLockerAbi } from "./abis/TokenLockerAbi";
 import { StakeDaoRewardVaultAbi } from "./abis/StakeDaoRewardVaultAbi";
+import { SharedLiquidityGaugeProxyAbi } from "./abis/SharedLiquidityGaugeProxyAbi";
+import { SharedLiquidityGaugeImplAbi } from "./abis/SharedLiquidityGaugeImplAbi";
+import { ConvexFxnPoolRegistryAbi } from "./abis/ConvexFxnPoolRegistryAbi";
 
 export default createConfig({
   database: {
@@ -145,6 +148,37 @@ export default createConfig({
       abi: YearnV3VaultAbi,
       address: "0x89E93172AEF8261Db8437b90c3dCb61545a05317",
       startBlock: 22978001,
+    },
+    // Defi Stable Avengers Pool
+    DsaLp: {
+      chain: "mainnet",
+      abi: CurveStableSwapNgAbi,
+      address: "0x8B878AFE454e31CF0A79c6D7cf2f077DD286C12f",
+      startBlock: 23240176,
+    },
+    // Defi Stable Avengers Pool FXN gauge
+    DsaFxnGauge: {
+      chain: "mainnet",
+      abi: mergeAbis([
+        SharedLiquidityGaugeProxyAbi,
+        SharedLiquidityGaugeImplAbi,
+      ]),
+      address: "0xE534E5e86382d64133ecd6b7f717C69BEC8B40CA",
+      startBlock: 23287332,
+    },
+    // Convex FXN pool registry
+    ConvexFxnPoolRegistry: {
+      chain: "mainnet",
+      abi: ConvexFxnPoolRegistryAbi,
+      address: "0xdB95d646012bB87aC2E6CD63eAb2C42323c1F5AF",
+      startBlock: 23240176, // DsaLp deployment block
+    },
+    // Curve gauge
+    DsaLpGauge: {
+      chain: "mainnet",
+      abi: CurveLiquidityGaugeV6Abi,
+      address: "0xb91cE18be6e3c04a8D22E350551e4313dE23527d",
+      startBlock: 23240181,
     },
   },
   blocks: {
