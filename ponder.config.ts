@@ -16,6 +16,10 @@ import { StakeDaoRewardVaultAbi } from "./abis/StakeDaoRewardVaultAbi";
 import { SharedLiquidityGaugeProxyAbi } from "./abis/SharedLiquidityGaugeProxyAbi";
 import { SharedLiquidityGaugeImplAbi } from "./abis/SharedLiquidityGaugeImplAbi";
 import { ConvexFxnPoolRegistryAbi } from "./abis/ConvexFxnPoolRegistryAbi";
+import { PendleMarketV3Abi } from "./abis/PendleMarketV3Abi";
+import { EqbPendleBoosterImplAbi } from "./abis/EqbPendleBoosterImplAbi";
+import { EqbPendleBoosterProxyAbi } from "./abis/EqbPendleBoosterProxyAbi";
+import { Erc20Abi } from "./abis/Erc20Abi";
 
 export default createConfig({
   database: {
@@ -179,6 +183,49 @@ export default createConfig({
       abi: CurveLiquidityGaugeV6Abi,
       address: "0xb91cE18be6e3c04a8D22E350551e4313dE23527d",
       startBlock: 23240181,
+    },
+    // Pendle
+    UsdafPendleLp: {
+      chain: "mainnet",
+      abi: PendleMarketV3Abi,
+      address: "0x8Bf03ACbF1C2aC2e487c80678De7873C954525D2",
+      startBlock: 23026848,
+    },
+    UsdafPenpieReceipt: {
+      chain: "mainnet",
+      abi: Erc20Abi,
+      address: "0xae0649aC58028cdca9294069EE6A31373B1DBD3C",
+      startBlock: 23087855,
+    },
+    UsdafPendleSdGauge: {
+      chain: "mainnet",
+      abi: StakeDaoLiquidityGaugeV4Abi,
+      address: "0x424973922B5f2cb4D71930729396d39cb123AB99",
+      startBlock: 23083580,
+    },
+    SusdafPendleLp: {
+      chain: "mainnet",
+      abi: PendleMarketV3Abi,
+      address: "0x233f5adf236CAB22C5DbDD3333a7EfD8267d7AEE",
+      startBlock: 23036283,
+    },
+    SusdafPenpieReceipt: {
+      chain: "mainnet",
+      abi: Erc20Abi,
+      address: "0x9bDE460dBbe1d53B8162D1f63E73B919592ba56b",
+      startBlock: 23087857,
+    },
+    SusdafPendleSdGauge: {
+      chain: "mainnet",
+      abi: StakeDaoLiquidityGaugeV4Abi,
+      address: "0x99EFf235f0e3B5b22D1863Ca95e7c778258A9e69",
+      startBlock: 23083580,
+    },
+    EqbPendleBooster: {
+      chain: "mainnet",
+      abi: mergeAbis([EqbPendleBoosterProxyAbi, EqbPendleBoosterImplAbi]),
+      address: "0x4D32C8Ff2fACC771eC7Efc70d6A8468bC30C26bF",
+      startBlock: 23026848, // UsdafPendleLp deployment block
     },
   },
   blocks: {

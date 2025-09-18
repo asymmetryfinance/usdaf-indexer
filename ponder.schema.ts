@@ -123,3 +123,19 @@ export const DsaLpBalance = onchainTable("dsa_lp_balance", (t) => ({
   depositor: t.hex().primaryKey(),
   balance: t.bigint().notNull().default(0n),
 }));
+
+export const UsdafPendleLpBalance = onchainTable(
+  "usdaf_pendle_lp_balance",
+  (t) => ({
+    depositor: t.hex().primaryKey(),
+    balance: t.bigint().notNull().default(0n),
+  })
+);
+
+export const SusdafPendleLpBalance = onchainTable(
+  "susdaf_pendle_lp_balance",
+  (t) => ({
+    depositor: t.hex().primaryKey(),
+    balance: t.bigint().notNull().default(0n),
+  })
+);
