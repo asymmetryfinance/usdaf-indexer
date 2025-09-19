@@ -132,6 +132,12 @@ export default createConfig({
       address: "0xD47FC7704dc185feb5195416E16ae531eFa400A4",
       startBlock: 21445720,
     },
+    CvxAfcvxSdGaugeV2: {
+      chain: "mainnet",
+      abi: StakeDaoRewardVaultAbi,
+      address: "0x4cDab85fd47058Bd4487C0cb09Cfb90B7D14D114",
+      startBlock: 23276582,
+    },
     // Curve gauge
     CvxAfcvxGauge: {
       chain: "mainnet",

@@ -107,6 +107,33 @@ export const VeasfLocks = onchainTable("veasf_locks", (t) => ({
   amount: t.bigint().notNull(),
   weeks: t.bigint().notNull(),
   timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
+}));
+
+export const VeasfLockExtended = onchainTable("veasf_lock_extended", (t) => ({
+  id: t.text().primaryKey(),
+  account: t.hex().notNull(),
+  amount: t.bigint().notNull(),
+  weeks: t.bigint().notNull(),
+  newWeeks: t.bigint().notNull(),
+  timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
+}));
+
+export const VeasfLocksFrozen = onchainTable("veasf_locks_frozen", (t) => ({
+  id: t.text().primaryKey(),
+  account: t.hex().notNull(),
+  amount: t.bigint().notNull(),
+  timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
+}));
+
+export const VeasfLockUnfrozen = onchainTable("veasf_lock_unfrozen", (t) => ({
+  id: t.text().primaryKey(),
+  account: t.hex().notNull(),
+  amount: t.bigint().notNull(),
+  timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
 }));
 
 // Defi Stable Avengers Convex vault mapping
