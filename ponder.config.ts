@@ -20,6 +20,8 @@ import { PendleMarketV3Abi } from "./abis/PendleMarketV3Abi";
 import { EqbPendleBoosterImplAbi } from "./abis/EqbPendleBoosterImplAbi";
 import { EqbPendleBoosterProxyAbi } from "./abis/EqbPendleBoosterProxyAbi";
 import { Erc20Abi } from "./abis/Erc20Abi";
+import { EulerVaultImplAbi } from "./abis/EulerVaultImplAbi";
+import { EulerVaultProxyAbi } from "./abis/EulerVaultProxyAbi";
 
 export default createConfig({
   database: {
@@ -232,6 +234,17 @@ export default createConfig({
       abi: mergeAbis([EqbPendleBoosterProxyAbi, EqbPendleBoosterImplAbi]),
       address: "0x4D32C8Ff2fACC771eC7Efc70d6A8468bC30C26bF",
       startBlock: 23026848, // UsdafPendleLp deployment block
+    },
+    // Euler
+    EulerVault: {
+      chain: "mainnet",
+      abi: mergeAbis([EulerVaultProxyAbi, EulerVaultImplAbi]),
+      address: [
+        "0x477d7feE2d9dca0bA8F7CbEAa7da219b5bb2d1a7", // USDC
+        "0x46DEA62E4D631ce3FaC68ECeC2b1C4bA1500075A", // USDaf
+        "0x51147D1af05AEb441dE62db292f46580084c8380", // USDT
+      ],
+      startBlock: 23390752,
     },
   },
   blocks: {

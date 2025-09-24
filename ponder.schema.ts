@@ -166,3 +166,15 @@ export const SusdafPendleLpBalance = onchainTable(
     balance: t.bigint().notNull().default(0n),
   })
 );
+
+// Euler Frontier Asym
+// balances in eVault shares
+export const EulerFrontierBalance = onchainTable(
+  "euler_frontier_balance",
+  (t) => ({
+    depositor: t.hex().primaryKey(),
+    usdcShares: t.bigint().notNull().default(0n),
+    usdafShares: t.bigint().notNull().default(0n),
+    usdtShares: t.bigint().notNull().default(0n),
+  })
+);
