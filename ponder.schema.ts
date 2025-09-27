@@ -107,7 +107,77 @@ export const VeasfLocks = onchainTable("veasf_locks", (t) => ({
   amount: t.bigint().notNull(),
   weeks: t.bigint().notNull(),
   timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
 }));
+
+export const VeasfLockExtended = onchainTable("veasf_lock_extended", (t) => ({
+  id: t.text().primaryKey(),
+  account: t.hex().notNull(),
+  amount: t.bigint().notNull(),
+  weeks: t.bigint().notNull(),
+  newWeeks: t.bigint().notNull(),
+  timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
+}));
+
+export const VeasfLocksFrozen = onchainTable("veasf_locks_frozen", (t) => ({
+  id: t.text().primaryKey(),
+  account: t.hex().notNull(),
+  amount: t.bigint().notNull(),
+  timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
+}));
+
+export const VeasfLockUnfrozen = onchainTable("veasf_lock_unfrozen", (t) => ({
+  id: t.text().primaryKey(),
+  account: t.hex().notNull(),
+  amount: t.bigint().notNull(),
+  timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
+}));
+
+// Defi Stable Avengers Convex vault mapping
+export const DsaLpConvexVaultMapping = onchainTable(
+  "dsa_lp_convex_vault_mapping",
+  (t) => ({
+    vault: t.hex().primaryKey(),
+    user: t.hex().notNull(),
+    transactionHash: t.hex().notNull(), // tx that created the vault
+  })
+);
+
+export const DsaLpBalance = onchainTable("dsa_lp_balance", (t) => ({
+  depositor: t.hex().primaryKey(),
+  balance: t.bigint().notNull().default(0n),
+}));
+
+export const UsdafPendleLpBalance = onchainTable(
+  "usdaf_pendle_lp_balance",
+  (t) => ({
+    depositor: t.hex().primaryKey(),
+    balance: t.bigint().notNull().default(0n),
+  })
+);
+
+export const SusdafPendleLpBalance = onchainTable(
+  "susdaf_pendle_lp_balance",
+  (t) => ({
+    depositor: t.hex().primaryKey(),
+    balance: t.bigint().notNull().default(0n),
+  })
+);
+
+// Euler Frontier Asym
+// balances in eVault shares
+export const EulerFrontierBalance = onchainTable(
+  "euler_frontier_balance",
+  (t) => ({
+    depositor: t.hex().primaryKey(),
+    usdcShares: t.bigint().notNull().default(0n),
+    usdafShares: t.bigint().notNull().default(0n),
+    usdtShares: t.bigint().notNull().default(0n),
+  })
+);
 
 // Redemption
 export const Redemption = onchainTable("redemption", (t) => ({

@@ -12,6 +12,16 @@ import { AfCvxImplAbi } from "./abis/AfCvxImplAbi";
 import { AfCvxProxyAbi } from "./abis/AfCvxProxyAbi";
 import { YearnV3VaultAbi } from "./abis/YearnV3VaultAbi";
 import { TokenLockerAbi } from "./abis/TokenLockerAbi";
+import { StakeDaoRewardVaultAbi } from "./abis/StakeDaoRewardVaultAbi";
+import { SharedLiquidityGaugeProxyAbi } from "./abis/SharedLiquidityGaugeProxyAbi";
+import { SharedLiquidityGaugeImplAbi } from "./abis/SharedLiquidityGaugeImplAbi";
+import { ConvexFxnPoolRegistryAbi } from "./abis/ConvexFxnPoolRegistryAbi";
+import { PendleMarketV3Abi } from "./abis/PendleMarketV3Abi";
+import { EqbPendleBoosterImplAbi } from "./abis/EqbPendleBoosterImplAbi";
+import { EqbPendleBoosterProxyAbi } from "./abis/EqbPendleBoosterProxyAbi";
+import { Erc20Abi } from "./abis/Erc20Abi";
+import { EulerVaultImplAbi } from "./abis/EulerVaultImplAbi";
+import { EulerVaultProxyAbi } from "./abis/EulerVaultProxyAbi";
 
 export default createConfig({
   // database: {
@@ -90,6 +100,13 @@ export default createConfig({
       address: "0xc9f278b4EeC0f7cD90c621d2f1432e5EE7F55738",
       startBlock: 23089468,
     },
+    // Stakedao v2 gauge
+    ScrvusdUsdafSdGaugeV2: {
+      chain: "mainnet",
+      abi: StakeDaoRewardVaultAbi,
+      address: "0xdC147Ba5aBD134f631A67190DEB97B7828B4aFB7",
+      startBlock: 23276535,
+    },
     // Yearn Vault
     ScrvusdUsdafYvault: {
       chain: "mainnet",
@@ -117,6 +134,12 @@ export default createConfig({
       address: "0xD47FC7704dc185feb5195416E16ae531eFa400A4",
       startBlock: 21445720,
     },
+    CvxAfcvxSdGaugeV2: {
+      chain: "mainnet",
+      abi: StakeDaoRewardVaultAbi,
+      address: "0x4cDab85fd47058Bd4487C0cb09Cfb90B7D14D114",
+      startBlock: 23276582,
+    },
     // Curve gauge
     CvxAfcvxGauge: {
       chain: "mainnet",
@@ -137,6 +160,91 @@ export default createConfig({
       abi: YearnV3VaultAbi,
       address: "0x89E93172AEF8261Db8437b90c3dCb61545a05317",
       startBlock: 22978001,
+    },
+    // Defi Stable Avengers Pool
+    DsaLp: {
+      chain: "mainnet",
+      abi: CurveStableSwapNgAbi,
+      address: "0x8B878AFE454e31CF0A79c6D7cf2f077DD286C12f",
+      startBlock: 23240176,
+    },
+    // Defi Stable Avengers Pool FXN gauge
+    DsaFxnGauge: {
+      chain: "mainnet",
+      abi: mergeAbis([
+        SharedLiquidityGaugeProxyAbi,
+        SharedLiquidityGaugeImplAbi,
+      ]),
+      address: "0xE534E5e86382d64133ecd6b7f717C69BEC8B40CA",
+      startBlock: 23287332,
+    },
+    // Convex FXN pool registry
+    ConvexFxnPoolRegistry: {
+      chain: "mainnet",
+      abi: ConvexFxnPoolRegistryAbi,
+      address: "0xdB95d646012bB87aC2E6CD63eAb2C42323c1F5AF",
+      startBlock: 23240176, // DsaLp deployment block
+    },
+    // Curve gauge
+    DsaLpGauge: {
+      chain: "mainnet",
+      abi: CurveLiquidityGaugeV6Abi,
+      address: "0xb91cE18be6e3c04a8D22E350551e4313dE23527d",
+      startBlock: 23240181,
+    },
+    // Pendle
+    UsdafPendleLp: {
+      chain: "mainnet",
+      abi: PendleMarketV3Abi,
+      address: "0x8Bf03ACbF1C2aC2e487c80678De7873C954525D2",
+      startBlock: 23026848,
+    },
+    UsdafPenpieReceipt: {
+      chain: "mainnet",
+      abi: Erc20Abi,
+      address: "0xae0649aC58028cdca9294069EE6A31373B1DBD3C",
+      startBlock: 23087855,
+    },
+    UsdafPendleSdGauge: {
+      chain: "mainnet",
+      abi: StakeDaoLiquidityGaugeV4Abi,
+      address: "0x424973922B5f2cb4D71930729396d39cb123AB99",
+      startBlock: 23083580,
+    },
+    SusdafPendleLp: {
+      chain: "mainnet",
+      abi: PendleMarketV3Abi,
+      address: "0x233f5adf236CAB22C5DbDD3333a7EfD8267d7AEE",
+      startBlock: 23036283,
+    },
+    SusdafPenpieReceipt: {
+      chain: "mainnet",
+      abi: Erc20Abi,
+      address: "0x9bDE460dBbe1d53B8162D1f63E73B919592ba56b",
+      startBlock: 23087857,
+    },
+    SusdafPendleSdGauge: {
+      chain: "mainnet",
+      abi: StakeDaoLiquidityGaugeV4Abi,
+      address: "0x99EFf235f0e3B5b22D1863Ca95e7c778258A9e69",
+      startBlock: 23083580,
+    },
+    EqbPendleBooster: {
+      chain: "mainnet",
+      abi: mergeAbis([EqbPendleBoosterProxyAbi, EqbPendleBoosterImplAbi]),
+      address: "0x4D32C8Ff2fACC771eC7Efc70d6A8468bC30C26bF",
+      startBlock: 23026848, // UsdafPendleLp deployment block
+    },
+    // Euler
+    EulerVault: {
+      chain: "mainnet",
+      abi: mergeAbis([EulerVaultProxyAbi, EulerVaultImplAbi]),
+      address: [
+        "0x477d7feE2d9dca0bA8F7CbEAa7da219b5bb2d1a7", // USDC
+        "0x46DEA62E4D631ce3FaC68ECeC2b1C4bA1500075A", // USDaf
+        "0x51147D1af05AEb441dE62db292f46580084c8380", // USDT
+      ],
+      startBlock: 23390752,
     },
   },
   blocks: {
