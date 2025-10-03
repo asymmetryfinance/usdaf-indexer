@@ -1,5 +1,9 @@
 import { ponder } from "ponder:registry";
-import { UsdafLpBalance, AfcvxLpBalance } from "ponder:schema";
+import {
+  UsdafLpBalance,
+  AfcvxLpBalance,
+  LqtyforksLpBalance,
+} from "ponder:schema";
 import { getAddress } from "viem";
 
 // Convex Booster events
@@ -32,6 +36,19 @@ ponder.on("ConvexBooster:Deposited", async ({ event, context }) => {
         balance: row.balance + event.args.amount,
       }));
   }
+
+  // pid 500 = LQTYFORKS pool
+  if (event.args.poolid === BigInt(500)) {
+    await context.db
+      .insert(LqtyforksLpBalance)
+      .values({
+        depositor: depositorAddress,
+        balance: event.args.amount,
+      })
+      .onConflictDoUpdate((row) => ({
+        balance: row.balance + event.args.amount,
+      }));
+  }
 });
 
 ponder.on("ConvexBooster:Withdrawn", async ({ event, context }) => {
@@ -50,6 +67,15 @@ ponder.on("ConvexBooster:Withdrawn", async ({ event, context }) => {
   if (event.args.poolid === BigInt(383)) {
     await context.db
       .update(AfcvxLpBalance, { depositor: depositorAddress })
+      .set((row) => ({
+        balance: row.balance - event.args.amount,
+      }));
+  }
+
+  // pid 500 = LQTYFORKS pool
+  if (event.args.poolid === BigInt(500)) {
+    await context.db
+      .update(LqtyforksLpBalance, { depositor: depositorAddress })
       .set((row) => ({
         balance: row.balance - event.args.amount,
       }));

@@ -178,3 +178,57 @@ export const EulerFrontierBalance = onchainTable(
     usdtShares: t.bigint().notNull().default(0n),
   })
 );
+
+// Redemption
+export const Redemption = onchainTable("redemption", (t) => ({
+  id: t.text().primaryKey(),
+  timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
+  troveManager: t.hex().notNull(),
+  attemptedBoldAmount: t.bigint().notNull(),
+  debtDecrease: t.bigint().notNull(),
+  collDecrease: t.bigint().notNull(),
+  price: t.bigint().notNull(),
+  redemptionPrice: t.bigint().notNull(),
+  entireColl: t.bigint().notNull(),
+  entireDebt: t.bigint().notNull(),
+}));
+
+// TroveUpdated
+export const TroveUpdated = onchainTable("trove_updated", (t) => ({
+  id: t.text().primaryKey(),
+  timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
+  troveManager: t.hex().notNull(),
+  troveId: t.bigint().notNull(),
+  debt: t.bigint().notNull(),
+  coll: t.bigint().notNull(),
+  stake: t.bigint().notNull(),
+  annualInterestRate: t.bigint().notNull(),
+  entireColl: t.bigint().notNull(),
+  entireDebt: t.bigint().notNull(),
+  price: t.bigint().notNull(),
+}));
+
+// TroveOperation
+export const TroveOperation = onchainTable("trove_operation", (t) => ({
+  id: t.text().primaryKey(),
+  timestamp: t.bigint().notNull(),
+  transactionHash: t.hex().notNull(),
+  troveManager: t.hex().notNull(),
+  troveId: t.bigint().notNull(),
+  op: t.integer().notNull(),
+  annualInterestRate: t.bigint().notNull(),
+  debtIncreaseFromRedist: t.bigint().notNull(),
+  debtIncreaseFromUpfrontFee: t.bigint().notNull(),
+  debtChangeFromOperation: t.bigint().notNull(),
+  collIncreaseFromRedist: t.bigint().notNull(),
+  collChangeFromOperation: t.bigint().notNull(),
+}));
+
+// Current LQTYFORKS LP balances for each depositor
+export const LqtyforksLpBalance = onchainTable("lqtyforks_lp_balance", (t) => ({
+  depositor: t.hex().primaryKey(),
+  balance: t.bigint().notNull().default(0n),
+  yvaultShares: t.bigint().notNull().default(0n),
+}));
