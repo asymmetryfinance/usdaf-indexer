@@ -24,10 +24,10 @@ import { EulerVaultImplAbi } from "./abis/EulerVaultImplAbi";
 import { EulerVaultProxyAbi } from "./abis/EulerVaultProxyAbi";
 
 export default createConfig({
-  // database: {
-  //   kind: "postgres",
-  //   connectionString: process.env.DATABASE_URL!,
-  // },
+  database: {
+    kind: "postgres",
+    connectionString: process.env.DATABASE_URL!,
+  },
   chains: {
     mainnet: {
       id: 1,
@@ -245,6 +245,24 @@ export default createConfig({
         "0x51147D1af05AEb441dE62db292f46580084c8380", // USDT
       ],
       startBlock: 23390752,
+    },
+    LqtyforksLp: {
+      chain: "mainnet",
+      abi: CurveStableSwapNgAbi,
+      address: "0x54628EA95D7e748c3783b855f4583DA96FB21895",
+      startBlock: 23338829,
+    },
+    LqtyforksGauge: {
+      chain: "mainnet",
+      abi: CurveLiquidityGaugeV6Abi,
+      address: "0xF575337B54C101111DA80B7a2e5440F6177BFF1a",
+      startBlock: 23379705,
+    },
+    LqtyforksSdGaugeV2: {
+      chain: "mainnet",
+      abi: StakeDaoRewardVaultAbi,
+      address: "0x690a086971A95c4fb91f5d692Aa0c6ca955f3061",
+      startBlock: 23488498,
     },
   },
   blocks: {
