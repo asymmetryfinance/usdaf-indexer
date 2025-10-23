@@ -75,7 +75,7 @@ ponder.on("USDaf:Transfer", async ({ event, context }) => {
 
   // case if USDaf transferred from SP
   if (Object.prototype.hasOwnProperty.call(spToColumn, from)) {
-    const column = spToColumn[to as keyof typeof spToColumn];
+    const column = spToColumn[from as keyof typeof spToColumn];
     // first we subtract from the running balances of SP
     const currentSpUsdafBalances = await context.db
       .update(CurrentSpUsdafBalances, { id: zeroAddress })

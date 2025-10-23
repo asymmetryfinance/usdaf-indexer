@@ -224,6 +224,8 @@ export const TroveOperation = onchainTable("trove_operation", (t) => ({
   debtChangeFromOperation: t.bigint().notNull(),
   collIncreaseFromRedist: t.bigint().notNull(),
   collChangeFromOperation: t.bigint().notNull(),
+  ownerCollChange: t.bigint().notNull(),
+  leveragedCollChange: t.bigint().notNull(),
 }));
 
 // Current LQTYFORKS LP balances for each depositor
