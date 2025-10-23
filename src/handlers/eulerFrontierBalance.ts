@@ -5,7 +5,7 @@ import { evaultToColumn } from "../mappings";
 
 // Euler Frontier
 ponder.on("EulerVault:Transfer", async ({ event, context }) => {
-  const evault = event.log.address;
+  const evault = getAddress(event.log.address);
   const from = getAddress(event.args.from);
   const to = getAddress(event.args.to);
   const shares = event.args.value;
@@ -24,6 +24,8 @@ ponder.on("EulerVault:Transfer", async ({ event, context }) => {
     await context.db
       .insert(EulerFrontierBalance)
       .values({ depositor: to, [column]: shares })
-      .onConflictDoUpdate((row) => ({ [column]: row[column] + shares }));
+      .onConflictDoUpdate((row) => ({
+        [column]: row[column] + shares,
+      }));
   }
 });
