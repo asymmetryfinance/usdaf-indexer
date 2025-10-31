@@ -3,6 +3,7 @@ import {
   UsdafLpBalance,
   AfcvxLpBalance,
   LqtyforksLpBalance,
+  FraxAfLpBalance,
 } from "ponder:schema";
 import { getAddress } from "viem";
 
@@ -49,6 +50,19 @@ ponder.on("ConvexBooster:Deposited", async ({ event, context }) => {
         balance: row.balance + event.args.amount,
       }));
   }
+
+  // pid 507 = FraxAf Pool
+  if (event.args.poolid === BigInt(507)) {
+    await context.db
+      .insert(FraxAfLpBalance)
+      .values({
+        depositor: depositorAddress,
+        balance: event.args.amount,
+      })
+      .onConflictDoUpdate((row) => ({
+        balance: row.balance + event.args.amount,
+      }));
+  }
 });
 
 ponder.on("ConvexBooster:Withdrawn", async ({ event, context }) => {
@@ -76,6 +90,15 @@ ponder.on("ConvexBooster:Withdrawn", async ({ event, context }) => {
   if (event.args.poolid === BigInt(500)) {
     await context.db
       .update(LqtyforksLpBalance, { depositor: depositorAddress })
+      .set((row) => ({
+        balance: row.balance - event.args.amount,
+      }));
+  }
+
+  // pid 507 = FraxAf Pool
+  if (event.args.poolid === BigInt(507)) {
+    await context.db
+      .update(FraxAfLpBalance, { depositor: depositorAddress })
       .set((row) => ({
         balance: row.balance - event.args.amount,
       }));
