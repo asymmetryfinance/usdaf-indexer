@@ -22,6 +22,8 @@ import { EqbPendleBoosterProxyAbi } from "./abis/EqbPendleBoosterProxyAbi";
 import { Erc20Abi } from "./abis/Erc20Abi";
 import { EulerVaultImplAbi } from "./abis/EulerVaultImplAbi";
 import { EulerVaultProxyAbi } from "./abis/EulerVaultProxyAbi";
+import { BeefyVaultV7ProxyAbi } from "./abis/BeefyVaultV7ProxyAbi";
+import { BeefyVaultV7ImplAbi } from "./abis/BeefyVaultV7ImplAbi";
 
 export default createConfig({
   database: {
@@ -114,6 +116,12 @@ export default createConfig({
       abi: YearnTokenVaultAbi,
       address: "0xe3Bf2D04cd3B6e74613D36368c7D21B2d6C26d72",
       startBlock: 23034279,
+    },
+    ScrvusdUsdafBeefyVault: {
+      chain: "mainnet",
+      abi: mergeAbis([BeefyVaultV7ProxyAbi, BeefyVaultV7ImplAbi]),
+      address: "0x5159B51CD1B72d3C6aD900B9C394E6B285017C42",
+      startBlock: 23438936,
     },
     // afCVX
     Afcvx: {
@@ -264,6 +272,24 @@ export default createConfig({
       abi: StakeDaoRewardVaultAbi,
       address: "0x690a086971A95c4fb91f5d692Aa0c6ca955f3061",
       startBlock: 23488498,
+    },
+    FraxAfLp: {
+      chain: "mainnet",
+      abi: CurveStableSwapNgAbi,
+      address: "0x20d4c49a873EaeFf76EfBD0cF19002F6E19EF52c",
+      startBlock: 23498052,
+    },
+    FraxAfGauge: {
+      chain: "mainnet",
+      abi: CurveLiquidityGaugeV6Abi,
+      address: "0xE424b21a40CAd025B2f806B9a2d32Fdeaa78eE58",
+      startBlock: 23498054,
+    },
+    FraxAfSdGaugeV2: {
+      chain: "mainnet",
+      abi: StakeDaoRewardVaultAbi,
+      address: "0x1D63392E93fBbe963d7D955626FB41Ad5E784fd3",
+      startBlock: 23690974,
     },
   },
   blocks: {

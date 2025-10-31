@@ -147,3 +147,32 @@ ponder.on("ScrvusdUsdafYvault:Transfer", async ({ event, context }) => {
       }));
   }
 });
+
+// SCRVUSD-USDaf Beefy vault
+ponder.on("ScrvusdUsdafBeefyVault:Transfer", async ({ event, context }) => {
+  const from = getAddress(event.args.from);
+  const to = getAddress(event.args.to);
+  const shares = event.args.value;
+
+  if (from !== zeroAddress) {
+    await context.db
+      .update(UsdafLpBalance, {
+        depositor: from,
+      })
+      .set((row) => ({
+        beefyShares: row.beefyShares - shares,
+      }));
+  }
+
+  if (to !== zeroAddress) {
+    await context.db
+      .insert(UsdafLpBalance)
+      .values({
+        depositor: to,
+        beefyShares: shares,
+      })
+      .onConflictDoUpdate((row) => ({
+        beefyShares: row.beefyShares + shares,
+      }));
+  }
+});

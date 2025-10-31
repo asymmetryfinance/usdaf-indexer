@@ -79,6 +79,7 @@ export const UsdafLpBalance = onchainTable("usdaf_lp_balance", (t) => ({
   depositor: t.hex().primaryKey(),
   balance: t.bigint().notNull().default(0n),
   yvaultShares: t.bigint().notNull().default(0n),
+  beefyShares: t.bigint().notNull().default(0n),
 }));
 
 // Current afCVX LP balances for each depositor
@@ -230,6 +231,13 @@ export const TroveOperation = onchainTable("trove_operation", (t) => ({
 
 // Current LQTYFORKS LP balances for each depositor
 export const LqtyforksLpBalance = onchainTable("lqtyforks_lp_balance", (t) => ({
+  depositor: t.hex().primaryKey(),
+  balance: t.bigint().notNull().default(0n),
+  yvaultShares: t.bigint().notNull().default(0n),
+}));
+
+// Current FraxAf LP balances for each depositor
+export const FraxAfLpBalance = onchainTable("fraxaf_lp_balance", (t) => ({
   depositor: t.hex().primaryKey(),
   balance: t.bigint().notNull().default(0n),
   yvaultShares: t.bigint().notNull().default(0n),
