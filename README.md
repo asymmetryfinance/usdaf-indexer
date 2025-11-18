@@ -8,7 +8,6 @@ Currently indexes data to calculate StabilityPool APYs, but can be expanded in t
 
 ```bash
 yarn install
-
 ```
 
 2. Create/edit `.env.local` with 2 environment variables
