@@ -20,7 +20,7 @@ ponder.on("DsaLp:Transfer", async ({ event, context }) => {
   }
 
   // if sender is not 0x0, we subtract from their balance
-  if (event.args.sender !== zeroAddress) {
+  if (event.args.sender !== zeroAddress && event.args.value !== 0n) {
     await context.db
       .update(DsaLpBalance, { depositor: getAddress(event.args.sender) })
       .set((row) => ({
@@ -67,7 +67,7 @@ ponder.on("DsaFxnGauge:Transfer", async ({ event, context }) => {
   }
 
   // if sender is not 0x0, we subtract from their balance
-  if (event.args.from !== zeroAddress) {
+  if (event.args.from !== zeroAddress && event.args.value !== 0n) {
     const from = getAddress(event.args.from);
     const convexVault = await context.db.find(DsaLpConvexVaultMapping, {
       vault: from,
@@ -82,7 +82,7 @@ ponder.on("DsaFxnGauge:Transfer", async ({ event, context }) => {
 });
 
 ponder.on("DsaLpGauge:Transfer", async ({ event, context }) => {
-  if (event.args._from !== zeroAddress) {
+  if (event.args._from !== zeroAddress && event.args._value !== 0n) {
     await context.db
       .update(DsaLpBalance, {
         depositor: getAddress(event.args._from),

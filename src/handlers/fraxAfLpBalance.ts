@@ -18,7 +18,7 @@ ponder.on("FraxAfLp:Transfer", async ({ event, context }) => {
   }
 
   // if sender is not 0x0, we subtract from their balance
-  if (event.args.sender !== zeroAddress) {
+  if (event.args.sender !== zeroAddress && event.args.value !== 0n) {
     await context.db
       .update(FraxAfLpBalance, { depositor: getAddress(event.args.sender) })
       .set((row) => ({
@@ -33,7 +33,7 @@ ponder.on("FraxAfSdGaugeV2:Transfer", async ({ event, context }) => {
   const to = getAddress(event.args.to);
   const value = event.args.value;
 
-  if (from !== zeroAddress) {
+  if (from !== zeroAddress && value !== 0n) {
     await context.db
       .update(FraxAfLpBalance, {
         depositor: from,
@@ -58,7 +58,7 @@ ponder.on("FraxAfSdGaugeV2:Transfer", async ({ event, context }) => {
 
 // Curve Gauge
 ponder.on("FraxAfGauge:Transfer", async ({ event, context }) => {
-  if (event.args._from !== zeroAddress) {
+  if (event.args._from !== zeroAddress && event.args._value !== 0n) {
     await context.db
       .update(FraxAfLpBalance, {
         depositor: getAddress(event.args._from),

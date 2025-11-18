@@ -12,7 +12,7 @@ ponder.on("EulerVault:Transfer", async ({ event, context }) => {
 
   const column = evaultToColumn[evault as keyof typeof evaultToColumn];
 
-  if (from !== zeroAddress) {
+  if (from !== zeroAddress && shares !== 0n) {
     await context.db
       .update(EulerFrontierBalance, { depositor: from })
       .set((row) => ({

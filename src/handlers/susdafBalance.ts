@@ -8,7 +8,7 @@ ponder.on("Susdaf:Transfer", async ({ event, context }) => {
   const receiver = getAddress(event.args.receiver);
   const shares = event.args.value;
 
-  if (sender !== zeroAddress) {
+  if (sender !== zeroAddress && shares !== 0n) {
     await context.db
       .update(SusdafBalance, { depositor: sender })
       .set((row) => ({
