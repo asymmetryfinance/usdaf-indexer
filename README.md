@@ -8,6 +8,7 @@ Currently indexes data to calculate StabilityPool APYs, but can be expanded in t
 
 ```bash
 yarn install
+
 ```
 
 2. Create/edit `.env.local` with 2 environment variables
@@ -88,7 +89,8 @@ When querying the above tables, it may be necessary to forward fill data for day
 
 - sUSDaf vault share balance
 
-`VeasfLocks` 
+`VeasfLocks`
+
 - Records all locks from deployment
 
 ## Deployment and Database
