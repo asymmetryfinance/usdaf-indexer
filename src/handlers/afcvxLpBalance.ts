@@ -18,7 +18,7 @@ ponder.on("CvxAfcvxLp:Transfer", async ({ event, context }) => {
   }
 
   // if sender is not 0x0, we subtract from their balance
-  if (event.args.sender !== zeroAddress) {
+  if (event.args.sender !== zeroAddress && event.args.value !== 0n) {
     await context.db
       .update(AfcvxLpBalance, { depositor: getAddress(event.args.sender) })
       .set((row) => ({
@@ -32,7 +32,8 @@ ponder.on("CvxAfcvxSdGauge:Transfer", async ({ event, context }) => {
   if (
     event.args._from !== zeroAddress &&
     getAddress(event.args._from) !==
-      "0x65f694948f6f59F18CdB503767A504253414EcD1" // staking_token from Stakedao Liquidity Gauge V4
+      "0x65f694948f6f59F18CdB503767A504253414EcD1" && // staking_token from Stakedao Liquidity Gauge V4
+    event.args._value !== 0n
   ) {
     await context.db
       .update(AfcvxLpBalance, {
@@ -70,7 +71,7 @@ ponder.on("CvxAfcvxSdGaugeV2:Transfer", async ({ event, context }) => {
   const to = getAddress(event.args.to);
   const value = event.args.value;
 
-  if (from !== zeroAddress) {
+  if (from !== zeroAddress && value !== 0n) {
     await context.db
       .update(AfcvxLpBalance, {
         depositor: from,
@@ -95,7 +96,7 @@ ponder.on("CvxAfcvxSdGaugeV2:Transfer", async ({ event, context }) => {
 
 // Curve Gauge
 ponder.on("CvxAfcvxGauge:Transfer", async ({ event, context }) => {
-  if (event.args._from !== zeroAddress) {
+  if (event.args._from !== zeroAddress && event.args._value !== 0n) {
     await context.db
       .update(AfcvxLpBalance, {
         depositor: getAddress(event.args._from),
@@ -124,7 +125,7 @@ ponder.on("CvxAfcvxYvault:Transfer", async ({ event, context }) => {
   const receiver = getAddress(event.args.receiver);
   const shares = event.args.value;
 
-  if (sender !== zeroAddress) {
+  if (sender !== zeroAddress && shares !== 0n) {
     await context.db
       .update(AfcvxLpBalance, {
         depositor: sender,

@@ -17,8 +17,8 @@ ponder.on("ScrvusdUsdafLp:Transfer", async ({ event, context }) => {
       }));
   }
 
-  // if sender is not 0x0, we subtract from their balance
-  if (event.args.sender !== zeroAddress) {
+  // if sender is not 0x0 and value is not 0, we subtract from their balance
+  if (event.args.sender !== zeroAddress && event.args.value !== 0n) {
     await context.db
       .update(UsdafLpBalance, { depositor: getAddress(event.args.sender) })
       .set((row) => ({
@@ -32,7 +32,8 @@ ponder.on("ScrvusdUsdafSdGauge:Transfer", async ({ event, context }) => {
   if (
     event.args._from !== zeroAddress &&
     getAddress(event.args._from) !==
-      "0x42c006fE6958a5211513AA61a9b3145E99dDEEFF" // staking_token from Stakedao Liquidity Gauge V4
+      "0x42c006fE6958a5211513AA61a9b3145E99dDEEFF" &&
+    event.args._value !== 0n // staking_token from Stakedao Liquidity Gauge V4
   ) {
     await context.db
       .update(UsdafLpBalance, {
@@ -71,7 +72,7 @@ ponder.on("ScrvusdUsdafSdGaugeV2:Transfer", async ({ event, context }) => {
   const to = getAddress(event.args.to);
   const value = event.args.value;
 
-  if (from !== zeroAddress) {
+  if (from !== zeroAddress && value !== 0n) {
     await context.db
       .update(UsdafLpBalance, {
         depositor: from,
@@ -96,7 +97,7 @@ ponder.on("ScrvusdUsdafSdGaugeV2:Transfer", async ({ event, context }) => {
 
 // Curve Gauge
 ponder.on("ScrvusdUsdafGauge:Transfer", async ({ event, context }) => {
-  if (event.args._from !== zeroAddress) {
+  if (event.args._from !== zeroAddress && event.args._value !== 0n) {
     await context.db
       .update(UsdafLpBalance, {
         depositor: getAddress(event.args._from),
@@ -125,7 +126,7 @@ ponder.on("ScrvusdUsdafYvault:Transfer", async ({ event, context }) => {
   const receiver = getAddress(event.args.receiver);
   const shares = event.args.value;
 
-  if (sender !== zeroAddress) {
+  if (sender !== zeroAddress && shares !== 0n) {
     await context.db
       .update(UsdafLpBalance, {
         depositor: sender,
@@ -154,7 +155,7 @@ ponder.on("ScrvusdUsdafBeefyVault:Transfer", async ({ event, context }) => {
   const to = getAddress(event.args.to);
   const shares = event.args.value;
 
-  if (from !== zeroAddress) {
+  if (from !== zeroAddress && shares !== 0n) {
     await context.db
       .update(UsdafLpBalance, {
         depositor: from,

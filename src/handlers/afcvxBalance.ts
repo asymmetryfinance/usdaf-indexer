@@ -8,7 +8,7 @@ ponder.on("Afcvx:Transfer", async ({ event, context }) => {
   const to = getAddress(event.args.to);
   const value = event.args.value;
 
-  if (from !== zeroAddress) {
+  if (from !== zeroAddress && value !== 0n) {
     await context.db.update(AfcvxBalance, { depositor: from }).set((row) => ({
       balance: row.balance - value,
     }));

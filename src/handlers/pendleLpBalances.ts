@@ -5,7 +5,7 @@ import { getAddress, zeroAddress } from "viem";
 // Pendle LP
 // Usdaf Pendle LP
 ponder.on("UsdafPendleLp:Transfer", async ({ event, context }) => {
-  if (event.args.from !== zeroAddress) {
+  if (event.args.from !== zeroAddress && event.args.value !== 0n) {
     await context.db
       .update(UsdafPendleLpBalance, {
         depositor: getAddress(event.args.from),
@@ -30,7 +30,7 @@ ponder.on("UsdafPendleLp:Transfer", async ({ event, context }) => {
 
 // Usdaf Penpie
 ponder.on("UsdafPenpieReceipt:Transfer", async ({ event, context }) => {
-  if (event.args.from !== zeroAddress) {
+  if (event.args.from !== zeroAddress && event.args.value !== 0n) {
     await context.db
       .update(UsdafPendleLpBalance, {
         depositor: getAddress(event.args.from),
@@ -55,7 +55,7 @@ ponder.on("UsdafPenpieReceipt:Transfer", async ({ event, context }) => {
 
 // Susdaf Pendle LP
 ponder.on("SusdafPendleLp:Transfer", async ({ event, context }) => {
-  if (event.args.from !== zeroAddress) {
+  if (event.args.from !== zeroAddress && event.args.value !== 0n) {
     await context.db
       .update(SusdafPendleLpBalance, {
         depositor: getAddress(event.args.from),
@@ -80,7 +80,7 @@ ponder.on("SusdafPendleLp:Transfer", async ({ event, context }) => {
 
 // Susdaf Penpie
 ponder.on("SusdafPenpieReceipt:Transfer", async ({ event, context }) => {
-  if (event.args.from !== zeroAddress) {
+  if (event.args.from !== zeroAddress && event.args.value !== 0n) {
     await context.db
       .update(SusdafPendleLpBalance, {
         depositor: getAddress(event.args.from),
@@ -164,7 +164,8 @@ ponder.on("UsdafPendleSdGauge:Transfer", async ({ event, context }) => {
   if (
     event.args._from !== zeroAddress &&
     getAddress(event.args._from) !==
-      "0xf67CC715c927b36c95D86Aa93FeB8b989Dc9154A" // staking_token from Stakedao Liquidity Gauge V4
+      "0xf67CC715c927b36c95D86Aa93FeB8b989Dc9154A" && // staking_token from Stakedao Liquidity Gauge V4
+    event.args._value !== 0n
   ) {
     await context.db
       .update(UsdafPendleLpBalance, {
@@ -203,7 +204,8 @@ ponder.on("SusdafPendleSdGauge:Transfer", async ({ event, context }) => {
   if (
     event.args._from !== zeroAddress &&
     getAddress(event.args._from) !==
-      "0xfc37c789f3B72170c6f89d55A461B75DC802731E" // staking_token from Stakedao Liquidity Gauge V4
+      "0xfc37c789f3B72170c6f89d55A461B75DC802731E" && // staking_token from Stakedao Liquidity Gauge V4
+    event.args._value !== 0n
   ) {
     await context.db
       .update(SusdafPendleLpBalance, {
