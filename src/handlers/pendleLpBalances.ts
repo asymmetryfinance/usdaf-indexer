@@ -1,239 +1,243 @@
 import { ponder } from "ponder:registry";
-import { UsdafPendleLpBalance, SusdafPendleLpBalance } from "ponder:schema";
+import { PendleLpBalance, PendleBooster } from "ponder:schema";
+import { markets } from "../pendleMarkets";
 import { getAddress, zeroAddress } from "viem";
+import { eq } from "drizzle-orm";
 
 // Pendle LP
-// Usdaf Pendle LP
-ponder.on("UsdafPendleLp:Transfer", async ({ event, context }) => {
-  if (event.args.from !== zeroAddress && event.args.value !== 0n) {
+ponder.on("PendleLp:Transfer", async ({ event, context }) => {
+  const market = event.log.address;
+  const from = event.args.from;
+  const to = event.args.to;
+  const value = event.args.value;
+
+  if (from !== zeroAddress && value !== 0n) {
     await context.db
-      .update(UsdafPendleLpBalance, {
-        depositor: getAddress(event.args.from),
+      .update(PendleLpBalance, {
+        id: `${market}-${from}`,
       })
       .set((row) => ({
-        balance: row.balance - event.args.value,
+        balance: row.balance - value,
       }));
   }
 
-  if (event.args.to !== zeroAddress) {
+  if (to !== zeroAddress) {
     await context.db
-      .insert(UsdafPendleLpBalance)
+      .insert(PendleLpBalance)
       .values({
-        depositor: getAddress(event.args.to),
-        balance: event.args.value,
+        id: `${market}-${to}`,
+        balance: value,
       })
       .onConflictDoUpdate((row) => ({
-        balance: row.balance + event.args.value,
+        balance: row.balance + value,
       }));
   }
 });
 
-// Usdaf Penpie
-ponder.on("UsdafPenpieReceipt:Transfer", async ({ event, context }) => {
-  if (event.args.from !== zeroAddress && event.args.value !== 0n) {
+// Penpie new pool indexing
+ponder.on("PenpieStaking:PoolAdded", async ({ event, context }) => {
+  const market = event.args._market;
+  if (markets.includes(getAddress(market))) {
     await context.db
-      .update(UsdafPendleLpBalance, {
-        depositor: getAddress(event.args.from),
+      .insert(PendleBooster)
+      .values({
+        market: market,
+        penpieReceiptToken: event.args._receiptToken,
+      })
+      .onConflictDoUpdate({ penpieReceiptToken: event.args._receiptToken });
+  }
+});
+
+// Penpie receipt token transfer
+ponder.on("PenpieReceipt:Transfer", async ({ event, context }) => {
+  const receiptToken = event.log.address;
+
+  // Check if this receipt token is for one of our Pendle markets
+  const boosterRecord = await context.db.sql.query.PendleBooster.findFirst({
+    where: eq(PendleBooster.penpieReceiptToken, receiptToken),
+  });
+
+  if (boosterRecord) {
+    const market = boosterRecord.market;
+    const from = event.args.from;
+    const to = event.args.to;
+    const value = event.args.value;
+
+    if (from !== zeroAddress && value !== 0n) {
+      await context.db
+        .update(PendleLpBalance, {
+          id: `${market}-${from}`,
+        })
+        .set((row) => ({
+          balance: row.balance - value,
+        }));
+    }
+
+    if (to !== zeroAddress) {
+      await context.db
+        .insert(PendleLpBalance)
+        .values({
+          id: `${market}-${to}`,
+          balance: value,
+        })
+        .onConflictDoUpdate((row) => ({
+          balance: row.balance + value,
+        }));
+    }
+  }
+});
+
+// Stakedao new pool indexing
+ponder.on("SdPendleVaultFactory:VaultDeployed", async ({ event, context }) => {
+  const market = event.args.lptToken;
+  if (markets.includes(getAddress(market))) {
+    await context.db
+      .insert(PendleBooster)
+      .values({
+        market: market,
+        stakedaoStakingToken: event.args.proxy,
+      })
+      .onConflictDoUpdate({
+        stakedaoStakingToken: event.args.proxy,
+      });
+  }
+});
+
+ponder.on("SdPendleVaultFactory:GaugeDeployed", async ({ event, context }) => {
+  const stakeToken = event.args.stakeToken;
+  const boosterRecord = await context.db.sql.query.PendleBooster.findFirst({
+    where: eq(PendleBooster.stakedaoStakingToken, stakeToken),
+  });
+  if (boosterRecord) {
+    await context.db
+      .update(PendleBooster, {
+        market: boosterRecord.market,
+      })
+      .set({ stakedaoGauge: event.args.proxy });
+  }
+});
+
+ponder.on("SdPendleGauge:Transfer", async ({ event, context }) => {
+  const gauge = event.log.address;
+
+  // Check if this gauge is for one of our Pendle markets
+  const boosterRecord = await context.db.sql.query.PendleBooster.findFirst({
+    where: eq(PendleBooster.stakedaoGauge, gauge),
+  });
+
+  if (boosterRecord) {
+    const market = boosterRecord.market;
+    const stakeToken = boosterRecord.stakedaoStakingToken;
+    const from = event.args._from;
+    const to = event.args._to;
+    const value = event.args._value;
+
+    if (from !== zeroAddress && from !== stakeToken && value !== 0n) {
+      await context.db
+        .update(PendleLpBalance, {
+          id: `${market}-${from}`,
+        })
+        .set((row) => ({
+          balance: row.balance - value,
+        }));
+    }
+
+    if (to !== zeroAddress) {
+      await context.db
+        .insert(PendleLpBalance)
+        .values({
+          id: `${market}-${to}`,
+          balance: value,
+        })
+        .onConflictDoUpdate((row) => ({
+          balance: row.balance + value,
+        }));
+    }
+  }
+});
+
+ponder.on("SdPendleGauge:Withdraw", async ({ event, context }) => {
+  const gauge = event.log.address;
+
+  // Check if this gauge is for one of our Pendle markets
+  const boosterRecord = await context.db.sql.query.PendleBooster.findFirst({
+    where: eq(PendleBooster.stakedaoGauge, gauge),
+  });
+
+  if (boosterRecord) {
+    const market = boosterRecord.market;
+    const depositor = event.args.provider;
+    const value = event.args.value;
+
+    await context.db
+      .update(PendleLpBalance, {
+        id: `${market}-${depositor}`,
       })
       .set((row) => ({
-        balance: row.balance - event.args.value,
-      }));
-  }
-
-  if (event.args.to !== zeroAddress) {
-    await context.db
-      .insert(UsdafPendleLpBalance)
-      .values({
-        depositor: getAddress(event.args.to),
-        balance: event.args.value,
-      })
-      .onConflictDoUpdate((row) => ({
-        balance: row.balance + event.args.value,
+        balance: row.balance - value,
       }));
   }
 });
 
-// Susdaf Pendle LP
-ponder.on("SusdafPendleLp:Transfer", async ({ event, context }) => {
-  if (event.args.from !== zeroAddress && event.args.value !== 0n) {
+// Equilibria new pool indexing
+ponder.on("EqbPendleBooster:PoolAdded", async ({ event, context }) => {
+  const market = event.args._market;
+  if (markets.includes(getAddress(market))) {
     await context.db
-      .update(SusdafPendleLpBalance, {
-        depositor: getAddress(event.args.from),
-      })
-      .set((row) => ({
-        balance: row.balance - event.args.value,
-      }));
-  }
-
-  if (event.args.to !== zeroAddress) {
-    await context.db
-      .insert(SusdafPendleLpBalance)
+      .insert(PendleBooster)
       .values({
-        depositor: getAddress(event.args.to),
-        balance: event.args.value,
+        market: market,
+        eqbPoolId: event.args._pid,
       })
-      .onConflictDoUpdate((row) => ({
-        balance: row.balance + event.args.value,
-      }));
-  }
-});
-
-// Susdaf Penpie
-ponder.on("SusdafPenpieReceipt:Transfer", async ({ event, context }) => {
-  if (event.args.from !== zeroAddress && event.args.value !== 0n) {
-    await context.db
-      .update(SusdafPendleLpBalance, {
-        depositor: getAddress(event.args.from),
-      })
-      .set((row) => ({
-        balance: row.balance - event.args.value,
-      }));
-  }
-
-  if (event.args.to !== zeroAddress) {
-    await context.db
-      .insert(SusdafPendleLpBalance)
-      .values({
-        depositor: getAddress(event.args.to),
-        balance: event.args.value,
-      })
-      .onConflictDoUpdate((row) => ({
-        balance: row.balance + event.args.value,
-      }));
+      .onConflictDoUpdate({ eqbPoolId: event.args._pid });
   }
 });
 
 // Eqb Pendle Booster
 ponder.on("EqbPendleBooster:Deposited", async ({ event, context }) => {
   const poolId = event.args._poolid;
-  const depositor = getAddress(event.args._user);
 
-  // Usdaf pool
-  if (poolId === BigInt(281)) {
+  // Check if this pool id is for one of our Pendle markets
+  const boosterRecord = await context.db.sql.query.PendleBooster.findFirst({
+    where: eq(PendleBooster.eqbPoolId, poolId),
+  });
+
+  if (boosterRecord) {
+    const market = boosterRecord.market;
+    const depositor = event.args._user;
+    const amount = event.args._amount;
+
     await context.db
-      .insert(UsdafPendleLpBalance)
+      .insert(PendleLpBalance)
       .values({
-        depositor: depositor,
-        balance: event.args._amount,
+        id: `${market}-${depositor}`,
+        balance: amount,
       })
       .onConflictDoUpdate((row) => ({
-        balance: row.balance + event.args._amount,
-      }));
-  }
-
-  // sUSDaf pool
-  if (poolId === BigInt(282)) {
-    await context.db
-      .insert(SusdafPendleLpBalance)
-      .values({
-        depositor: depositor,
-        balance: event.args._amount,
-      })
-      .onConflictDoUpdate((row) => ({
-        balance: row.balance + event.args._amount,
+        balance: row.balance + amount,
       }));
   }
 });
 
 ponder.on("EqbPendleBooster:Withdrawn", async ({ event, context }) => {
   const poolId = event.args._poolid;
-  const depositor = getAddress(event.args._user);
 
-  // Usdaf pool
-  if (poolId === BigInt(281)) {
-    await context.db
-      .update(UsdafPendleLpBalance, { depositor: depositor })
-      .set((row) => ({
-        balance: row.balance - event.args._amount,
-      }));
-  }
+  // Check if this pool id is for one of our Pendle markets
+  const boosterRecord = await context.db.sql.query.PendleBooster.findFirst({
+    where: eq(PendleBooster.eqbPoolId, poolId),
+  });
 
-  // sUSDaf pool
-  if (poolId === BigInt(282)) {
-    await context.db
-      .update(SusdafPendleLpBalance, { depositor: depositor })
-      .set((row) => ({
-        balance: row.balance - event.args._amount,
-      }));
-  }
-});
+  if (boosterRecord) {
+    const market = boosterRecord.market;
+    const depositor = event.args._user;
+    const amount = event.args._amount;
 
-// Stakedao Pendle
-// USDaf
-ponder.on("UsdafPendleSdGauge:Transfer", async ({ event, context }) => {
-  if (
-    event.args._from !== zeroAddress &&
-    getAddress(event.args._from) !==
-      "0xf67CC715c927b36c95D86Aa93FeB8b989Dc9154A" && // staking_token from Stakedao Liquidity Gauge V4
-    event.args._value !== 0n
-  ) {
     await context.db
-      .update(UsdafPendleLpBalance, {
-        depositor: getAddress(event.args._from),
+      .update(PendleLpBalance, {
+        id: `${market}-${depositor}`,
       })
       .set((row) => ({
-        balance: row.balance - event.args._value,
+        balance: row.balance - amount,
       }));
   }
-
-  if (event.args._to !== zeroAddress) {
-    await context.db
-      .insert(UsdafPendleLpBalance)
-      .values({
-        depositor: getAddress(event.args._to),
-        balance: event.args._value,
-      })
-      .onConflictDoUpdate((row) => ({
-        balance: row.balance + event.args._value,
-      }));
-  }
-});
-
-ponder.on("UsdafPendleSdGauge:Withdraw", async ({ event, context }) => {
-  const depositorAddress = getAddress(event.args.provider);
-  await context.db
-    .update(UsdafPendleLpBalance, { depositor: depositorAddress })
-    .set((row) => ({
-      balance: row.balance - event.args.value,
-    }));
-});
-
-// Stakedao Pendle
-// sUSDaf
-ponder.on("SusdafPendleSdGauge:Transfer", async ({ event, context }) => {
-  if (
-    event.args._from !== zeroAddress &&
-    getAddress(event.args._from) !==
-      "0xfc37c789f3B72170c6f89d55A461B75DC802731E" && // staking_token from Stakedao Liquidity Gauge V4
-    event.args._value !== 0n
-  ) {
-    await context.db
-      .update(SusdafPendleLpBalance, {
-        depositor: getAddress(event.args._from),
-      })
-      .set((row) => ({
-        balance: row.balance - event.args._value,
-      }));
-  }
-
-  if (event.args._to !== zeroAddress) {
-    await context.db
-      .insert(SusdafPendleLpBalance)
-      .values({
-        depositor: getAddress(event.args._to),
-        balance: event.args._value,
-      })
-      .onConflictDoUpdate((row) => ({
-        balance: row.balance + event.args._value,
-      }));
-  }
-});
-
-ponder.on("SusdafPendleSdGauge:Withdraw", async ({ event, context }) => {
-  const depositorAddress = getAddress(event.args.provider);
-  await context.db
-    .update(SusdafPendleLpBalance, { depositor: depositorAddress })
-    .set((row) => ({
-      balance: row.balance - event.args.value,
-    }));
 });

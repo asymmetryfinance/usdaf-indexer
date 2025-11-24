@@ -152,21 +152,18 @@ export const DsaLpBalance = onchainTable("dsa_lp_balance", (t) => ({
   balance: t.bigint().notNull().default(0n),
 }));
 
-export const UsdafPendleLpBalance = onchainTable(
-  "usdaf_pendle_lp_balance",
-  (t) => ({
-    depositor: t.hex().primaryKey(),
-    balance: t.bigint().notNull().default(0n),
-  })
-);
+export const PendleLpBalance = onchainTable("pendle_lp_balance", (t) => ({
+  id: t.text().primaryKey(),
+  balance: t.bigint().notNull().default(0n),
+}));
 
-export const SusdafPendleLpBalance = onchainTable(
-  "susdaf_pendle_lp_balance",
-  (t) => ({
-    depositor: t.hex().primaryKey(),
-    balance: t.bigint().notNull().default(0n),
-  })
-);
+export const PendleBooster = onchainTable("pendle_booster", (t) => ({
+  market: t.hex().primaryKey(),
+  stakedaoStakingToken: t.hex(),
+  stakedaoGauge: t.hex(),
+  penpieReceiptToken: t.hex(),
+  eqbPoolId: t.bigint(),
+}));
 
 // Euler Frontier Asym
 // balances in eVault shares

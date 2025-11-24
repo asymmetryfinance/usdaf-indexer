@@ -1,0 +1,5 @@
+export const markets: `0x${string}`[] = [
+  "0x8Bf03ACbF1C2aC2e487c80678De7873C954525D2",
+  "0x233f5adf236CAB22C5DbDD3333a7EfD8267d7AEE",
+  "0x13333E7CAf39a9f9203852E0817D923a3c2f549A",
+] as const;
