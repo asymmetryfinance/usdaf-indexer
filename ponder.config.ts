@@ -1,4 +1,5 @@
-import { createConfig, mergeAbis } from "ponder";
+import { createConfig, factory, mergeAbis } from "ponder";
+import { markets } from "./src/pendleMarkets";
 
 import { StabilityPoolAbi } from "./abis/StabilityPoolAbi";
 import { CurveStableSwapNgAbi } from "./abis/CurveStableSwapNgAbi";
@@ -24,6 +25,10 @@ import { EulerVaultImplAbi } from "./abis/EulerVaultImplAbi";
 import { EulerVaultProxyAbi } from "./abis/EulerVaultProxyAbi";
 import { BeefyVaultV7ProxyAbi } from "./abis/BeefyVaultV7ProxyAbi";
 import { BeefyVaultV7ImplAbi } from "./abis/BeefyVaultV7ImplAbi";
+import { PenpieStakingImplAbi } from "./abis/PenpieStakingImplAbi";
+import { PenpieStakingProxyAbi } from "./abis/PenpieStakingProxyAbi";
+import { PendleVaultFactoryAbi } from "./abis/PendleVaultFactoryAbi";
+import { parseAbiItem } from "viem";
 
 export default createConfig({
   database: {
@@ -202,41 +207,49 @@ export default createConfig({
       startBlock: 23240181,
     },
     // Pendle
-    UsdafPendleLp: {
+    PendleLp: {
       chain: "mainnet",
       abi: PendleMarketV3Abi,
-      address: "0x8Bf03ACbF1C2aC2e487c80678De7873C954525D2",
+      address: markets,
       startBlock: 23026848,
     },
-    UsdafPenpieReceipt: {
+    PenpieStaking: {
+      chain: "mainnet",
+      abi: mergeAbis([PenpieStakingImplAbi, PenpieStakingProxyAbi]),
+      address: "0x6E799758CEE75DAe3d84e09D40dc416eCf713652",
+      startBlock: 23026848,
+    },
+    PenpieReceipt: {
       chain: "mainnet",
       abi: Erc20Abi,
-      address: "0xae0649aC58028cdca9294069EE6A31373B1DBD3C",
-      startBlock: 23087855,
+      address: factory({
+        address: "0x6E799758CEE75DAe3d84e09D40dc416eCf713652",
+        event: parseAbiItem(
+          "event PoolAdded(address _market, address _rewarder, address _receiptToken)"
+        ),
+        parameter: "_receiptToken",
+        startBlock: 23026848,
+      }),
+      startBlock: 23026848,
     },
-    UsdafPendleSdGauge: {
+    SdPendleVaultFactory: {
+      chain: "mainnet",
+      abi: PendleVaultFactoryAbi,
+      address: "0x50D0335398435ac5cc617bd8eE1cFeE30a13f6BB",
+      startBlock: 23026848,
+    },
+    SdPendleGauge: {
       chain: "mainnet",
       abi: StakeDaoLiquidityGaugeV4Abi,
-      address: "0x424973922B5f2cb4D71930729396d39cb123AB99",
-      startBlock: 23083580,
-    },
-    SusdafPendleLp: {
-      chain: "mainnet",
-      abi: PendleMarketV3Abi,
-      address: "0x233f5adf236CAB22C5DbDD3333a7EfD8267d7AEE",
-      startBlock: 23036283,
-    },
-    SusdafPenpieReceipt: {
-      chain: "mainnet",
-      abi: Erc20Abi,
-      address: "0x9bDE460dBbe1d53B8162D1f63E73B919592ba56b",
-      startBlock: 23087857,
-    },
-    SusdafPendleSdGauge: {
-      chain: "mainnet",
-      abi: StakeDaoLiquidityGaugeV4Abi,
-      address: "0x99EFf235f0e3B5b22D1863Ca95e7c778258A9e69",
-      startBlock: 23083580,
+      address: factory({
+        address: "0x50D0335398435ac5cc617bd8eE1cFeE30a13f6BB",
+        event: parseAbiItem(
+          "event GaugeDeployed(address proxy, address stakeToken, address impl)"
+        ),
+        parameter: "proxy",
+        startBlock: 23026848,
+      }),
+      startBlock: 23026848,
     },
     EqbPendleBooster: {
       chain: "mainnet",
